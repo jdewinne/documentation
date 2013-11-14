@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Troubleshooting &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="troubleshooting">
+<h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h1>
+<p>This page contains some advice about errors and problems commonly encountered
+during the development of Django applications.</p>
+<div class="section" id="problems-running-django-admin-py">
+<span id="troubleshooting-django-admin-py"></span><h2>Problems running django-admin.py<a class="headerlink" href="#problems-running-django-admin-py" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="command-not-found-django-admin-py">
+<h3>&#8220;command not found: django-admin.py&#8221;<a class="headerlink" href="#command-not-found-django-admin-py" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="../ref/django-admin.html"><em>django-admin.py</em></a> should be on your system path if you
+installed Django via <tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span></tt>. If it&#8217;s not on your path, you can
+find it in <tt class="docutils literal"><span class="pre">site-packages/django/bin</span></tt>, where <tt class="docutils literal"><span class="pre">site-packages</span></tt> is a directory
+within your Python installation. Consider symlinking to <a class="reference internal" href="../ref/django-admin.html"><em>django-admin.py</em></a> from some place on your path, such as
+<tt class="file docutils literal"><span class="pre">/usr/local/bin</span></tt>.</p>
+</div>
+<div class="section" id="script-name-may-differ-in-distribution-packages">
+<h3>Script name may differ in distribution packages<a class="headerlink" href="#script-name-may-differ-in-distribution-packages" title="Permalink to this headline">¶</a></h3>
+<p>If you installed Django using a Linux distribution&#8217;s package manager
+(e.g. <tt class="docutils literal"><span class="pre">apt-get</span></tt> or <tt class="docutils literal"><span class="pre">yum</span></tt>) <tt class="docutils literal"><span class="pre">django-admin.py</span></tt> may have been renamed to
+<tt class="docutils literal"><span class="pre">django-admin</span></tt>; use that instead.</p>
+</div>
+<div class="section" id="mac-os-x-permissions">
+<h3>Mac OS X permissions<a class="headerlink" href="#mac-os-x-permissions" title="Permalink to this headline">¶</a></h3>
+<p>If you&#8217;re using Mac OS X, you may see the message &#8220;permission denied&#8221; when
+you try to run <tt class="docutils literal"><span class="pre">django-admin.py</span></tt>. This is because, on Unix-based systems like
+OS X, a file must be marked as &#8220;executable&#8221; before it can be run as a program.
+To do this, open Terminal.app and navigate (using the <tt class="docutils literal"><span class="pre">cd</span></tt> command) to the
+directory where <a class="reference internal" href="../ref/django-admin.html"><em>django-admin.py</em></a> is installed, then
+run the command <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">chmod</span> <span class="pre">+x</span> <span class="pre">django-admin.py</span></tt>.</p>
+</div>
+<div class="section" id="running-virtualenv-on-windows">
+<h3>Running virtualenv on Windows<a class="headerlink" href="#running-virtualenv-on-windows" title="Permalink to this headline">¶</a></h3>
+<p>If you used <a class="reference external" href="http://www.virtualenv.org/">virtualenv</a> to <a class="reference internal" href="../topics/install.html#installing-official-release"><em>install Django</em></a>
+on Windows, you may get an <tt class="docutils literal"><span class="pre">ImportError</span></tt> when you try to run
+<tt class="docutils literal"><span class="pre">django-admin.py</span></tt>. This is because Windows does not run the
+Python interpreter from your virtual environment unless you invoke it
+directly. Instead, prefix all commands that use .py files with <tt class="docutils literal"><span class="pre">python</span></tt> and
+use the full path to the file, like so:
+<tt class="docutils literal"><span class="pre">python</span> <span class="pre">C:\pythonXY\Scripts\django-admin.py</span></tt>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#problems-running-django-admin-py">Problems running django-admin.py</a><ul>
+<li><a class="reference internal" href="#command-not-found-django-admin-py">&#8220;command not found: django-admin.py&#8221;</a></li>
+<li><a class="reference internal" href="#script-name-may-differ-in-distribution-packages">Script name may differ in distribution packages</a></li>
+<li><a class="reference internal" href="#mac-os-x-permissions">Mac OS X permissions</a></li>
+<li><a class="reference internal" href="#running-virtualenv-on-windows">Running virtualenv on Windows</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/faq/troubleshooting.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

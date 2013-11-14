@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Deployment checklist &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="deployment-checklist">
+<h1>Deployment checklist<a class="headerlink" href="#deployment-checklist" title="Permalink to this headline">¶</a></h1>
+<p>The Internet is a hostile environment. Before deploying your Django project,
+you should take some time to review your settings, with security, performance,
+and operations in mind.</p>
+<p>Django includes many <a class="reference internal" href="../../topics/security.html"><em>security features</em></a>. Some are
+built-in and always enabled. Others are optional because they aren&#8217;t always
+appropriate, or because they&#8217;re inconvenient for development. For example,
+forcing HTTPS may not be suitable for all websites, and it&#8217;s impractical for
+local development.</p>
+<p>Performance optimizations are another category of trade-offs with convenience.
+For instance, caching is useful in production, less so for local development.
+Error reporting needs are also widely different.</p>
+<p>The following checklist includes settings that:</p>
+<ul class="simple">
+<li>must be set properly for Django to provide the expected level of security;</li>
+<li>are expected to be different in each environment;</li>
+<li>enable optional security features;</li>
+<li>enable performance optimizations;</li>
+<li>provide error reporting.</li>
+</ul>
+<p>Many of these settings are sensitive and should be treated as confidential. If
+you&#8217;re releasing the source code for your project, a common practice is to
+publish suitable settings for development, and to use a private settings
+module for production.</p>
+<div class="section" id="critical-settings">
+<h2>Critical settings<a class="headerlink" href="#critical-settings" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="setting-secret-key">
+<h3><a href="#id1"><span class="problematic" id="id2">:setting:`SECRET_KEY`</span></a><a class="headerlink" href="#setting-secret-key" title="Permalink to this headline">¶</a></h3>
+<p><strong>The secret key must be a large random value and it must be kept secret.</strong></p>
+<p>Make sure that the key used in production isn&#8217;t used anywhere else and avoid
+committing it to source control. This reduces the number of vectors from which
+an attacker may acquire the key.</p>
+<p>Instead of hardcoding the secret key in your settings module, consider loading
+it from an environment variable:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;SECRET_KEY&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>or from a file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;/etc/secret_key.txt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-debug">
+<h3><a href="#id3"><span class="problematic" id="id4">:setting:`DEBUG`</span></a><a class="headerlink" href="#setting-debug" title="Permalink to this headline">¶</a></h3>
+<p><strong>You must never enable debug in production.</strong></p>
+<p>You&#8217;re certainly developing your project with <a href="#id5"><span class="problematic" id="id6">:setting:`DEBUG = True &lt;DEBUG&gt;`</span></a>,
+since this enables handy features like full tracebacks in your browser.</p>
+<p>For a production environment, though, this is a really bad idea, because it
+leaks lots of information about your project: excerpts of your source code,
+local variables, settings, libraries used, etc.</p>
+</div>
+</div>
+<div class="section" id="environment-specific-settings">
+<h2>Environment-specific settings<a class="headerlink" href="#environment-specific-settings" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="setting-allowed-hosts">
+<h3><a href="#id7"><span class="problematic" id="id8">:setting:`ALLOWED_HOSTS`</span></a><a class="headerlink" href="#setting-allowed-hosts" title="Permalink to this headline">¶</a></h3>
+<p>When <a href="#id9"><span class="problematic" id="id10">:setting:`DEBUG = False &lt;DEBUG&gt;`</span></a>, Django doesn&#8217;t work at all without a
+suitable value for <a href="#id11"><span class="problematic" id="id12">:setting:`ALLOWED_HOSTS`</span></a>.</p>
+<p>This setting is required to protect your site against some CSRF attacks. If
+you use a wildcard, you must perform your own validation of the <tt class="docutils literal"><span class="pre">Host</span></tt> HTTP
+header, or otherwise ensure that you aren&#8217;t vulnerable to this category of
+attacks.</p>
+</div>
+<div class="section" id="setting-caches">
+<h3><a href="#id13"><span class="problematic" id="id14">:setting:`CACHES`</span></a><a class="headerlink" href="#setting-caches" title="Permalink to this headline">¶</a></h3>
+<p>If you&#8217;re using a cache, connection parameters may be different in development
+and in production.</p>
+<p>Cache servers often have weak authentication. Make sure they only accept
+connections from your application servers.</p>
+<p>If you&#8217;re using Memcached, consider using <a class="reference internal" href="../../topics/http/sessions.html#cached-sessions-backend"><em>cached sessions</em></a> to improve performance.</p>
+</div>
+<div class="section" id="setting-databases">
+<h3><a href="#id15"><span class="problematic" id="id16">:setting:`DATABASES`</span></a><a class="headerlink" href="#setting-databases" title="Permalink to this headline">¶</a></h3>
+<p>Database connection parameters are probably different in development and in
+production.</p>
+<p>Database passwords are very sensitive. You should protect them exactly like
+<a href="#id17"><span class="problematic" id="id18">:setting:`SECRET_KEY`</span></a>.</p>
+<p>For maximum security, make sure database servers only accept connections from
+your application servers.</p>
+<p>If you haven&#8217;t set up backups for your database, do it right now!</p>
+</div>
+<div class="section" id="setting-email-backend-and-related-settings">
+<h3><a href="#id19"><span class="problematic" id="id20">:setting:`EMAIL_BACKEND`</span></a> and related settings<a class="headerlink" href="#setting-email-backend-and-related-settings" title="Permalink to this headline">¶</a></h3>
+<p>If your site sends emails, these values need to be set correctly.</p>
+</div>
+<div class="section" id="setting-static-root-and-setting-static-url">
+<h3><a href="#id21"><span class="problematic" id="id22">:setting:`STATIC_ROOT`</span></a> and <a href="#id23"><span class="problematic" id="id24">:setting:`STATIC_URL`</span></a><a class="headerlink" href="#setting-static-root-and-setting-static-url" title="Permalink to this headline">¶</a></h3>
+<p>Static files are automatically served by the development server. In
+production, you must define a <a href="#id25"><span class="problematic" id="id26">:setting:`STATIC_ROOT`</span></a> directory where
+<a href="#id27"><span class="problematic" id="id28">:djadmin:`collectstatic`</span></a> will copy them.</p>
+<p>See <a class="reference internal" href="../static-files/index.html"><em>Managing static files (CSS, images)</em></a> for more information.</p>
+</div>
+<div class="section" id="setting-media-root-and-setting-media-url">
+<h3><a href="#id29"><span class="problematic" id="id30">:setting:`MEDIA_ROOT`</span></a> and <a href="#id31"><span class="problematic" id="id32">:setting:`MEDIA_URL`</span></a><a class="headerlink" href="#setting-media-root-and-setting-media-url" title="Permalink to this headline">¶</a></h3>
+<p>Media files are uploaded by your users. They&#8217;re untrusted! Make sure your web
+server never attempt to interpret them. For instance, if a user uploads a
+<tt class="docutils literal"><span class="pre">.php</span></tt> file , the web server shouldn&#8217;t execute it.</p>
+<p>Now is a good time to check your backup strategy for these files.</p>
+</div>
+</div>
+<div class="section" id="https">
+<h2>HTTPS<a class="headerlink" href="#https" title="Permalink to this headline">¶</a></h2>
+<p>Any website which allows users to log in should enforce site-wide HTTPS to
+avoid transmitting access tokens in clear. In Django, access tokens include
+the login/password, the session cookie, and password reset tokens. (You can&#8217;t
+do much to protect password reset tokens if you&#8217;re sending them by email.)</p>
+<p>Protecting sensitive areas such as the user account or the admin isn&#8217;t
+sufficient, because the same session cookie is used for HTTP and HTTPS. Your
+web server must redirect all HTTP traffic to HTTPS, and only transmit HTTPS
+requests to Django.</p>
+<p>Once you&#8217;ve set up HTTPS, enable the following settings.</p>
+<div class="section" id="setting-csrf-cookie-secure">
+<h3><a href="#id33"><span class="problematic" id="id34">:setting:`CSRF_COOKIE_SECURE`</span></a><a class="headerlink" href="#setting-csrf-cookie-secure" title="Permalink to this headline">¶</a></h3>
+<p>Set this to <tt class="docutils literal"><span class="pre">True</span></tt> to avoid transmitting the CSRF cookie over HTTP
+accidentally.</p>
+</div>
+<div class="section" id="setting-session-cookie-secure">
+<h3><a href="#id35"><span class="problematic" id="id36">:setting:`SESSION_COOKIE_SECURE`</span></a><a class="headerlink" href="#setting-session-cookie-secure" title="Permalink to this headline">¶</a></h3>
+<p>Set this to <tt class="docutils literal"><span class="pre">True</span></tt> to avoid transmitting the session cookie over HTTP
+accidentally.</p>
+</div>
+</div>
+<div class="section" id="performance-optimizations">
+<h2>Performance optimizations<a class="headerlink" href="#performance-optimizations" title="Permalink to this headline">¶</a></h2>
+<p>Setting <a href="#id37"><span class="problematic" id="id38">:setting:`DEBUG = False &lt;DEBUG&gt;`</span></a> disables several features that are
+only useful in development. In addition, you can tune the following settings.</p>
+<div class="section" id="setting-conn-max-age">
+<h3><a href="#id39"><span class="problematic" id="id40">:setting:`CONN_MAX_AGE`</span></a><a class="headerlink" href="#setting-conn-max-age" title="Permalink to this headline">¶</a></h3>
+<p>Enabling <a class="reference internal" href="../../ref/databases.html#persistent-database-connections"><em>persistent database connections</em></a> can result in a nice speed-up when
+connecting to the database accounts for a significant part of the request
+processing time.</p>
+<p>This helps a lot on virtualized hosts with limited network performance.</p>
+</div>
+<div class="section" id="setting-template-loaders">
+<h3><a href="#id41"><span class="problematic" id="id42">:setting:`TEMPLATE_LOADERS`</span></a><a class="headerlink" href="#setting-template-loaders" title="Permalink to this headline">¶</a></h3>
+<p>Enabling the cached template loader often improves performance drastically, as
+it avoids compiling each template every time it needs to be rendered. See the
+<a class="reference internal" href="../../ref/templates/api.html#template-loaders"><em>template loaders docs</em></a> for more information.</p>
+</div>
+</div>
+<div class="section" id="error-reporting">
+<h2>Error reporting<a class="headerlink" href="#error-reporting" title="Permalink to this headline">¶</a></h2>
+<p>By the time you push your code to production, it&#8217;s hopefully robust, but you
+can&#8217;t rule out unexpected errors. Thankfully, Django can capture errors and
+notify you accordingly.</p>
+<div class="section" id="setting-logging">
+<h3><a href="#id43"><span class="problematic" id="id44">:setting:`LOGGING`</span></a><a class="headerlink" href="#setting-logging" title="Permalink to this headline">¶</a></h3>
+<p>Review your logging configuration before putting your website in production,
+and check that it works as expected as soon as you have received some traffic.</p>
+<p>See <a class="reference internal" href="../../topics/logging.html"><em>Logging</em></a> for details on logging.</p>
+</div>
+<div class="section" id="setting-admins-and-setting-managers">
+<h3><a href="#id45"><span class="problematic" id="id46">:setting:`ADMINS`</span></a> and <a href="#id47"><span class="problematic" id="id48">:setting:`MANAGERS`</span></a><a class="headerlink" href="#setting-admins-and-setting-managers" title="Permalink to this headline">¶</a></h3>
+<p><a href="#id49"><span class="problematic" id="id50">:setting:`ADMINS`</span></a> will be notified of 500 errors by email.</p>
+<p><a href="#id51"><span class="problematic" id="id52">:setting:`MANAGERS`</span></a> will be notified of 404 errors.
+<a href="#id53"><span class="problematic" id="id54">:setting:`IGNORABLE_404_URLS`</span></a> can help filter out spurious reports.</p>
+<p>See <a class="reference internal" href="../error-reporting.html"><em>Error reporting</em></a> for details on error reporting by email.</p>
+</div>
+<div class="section" id="customize-the-default-error-views">
+<h3>Customize the default error views<a class="headerlink" href="#customize-the-default-error-views" title="Permalink to this headline">¶</a></h3>
+<p>Django includes default views and templates for several HTTP error codes. You
+may want to override the default templates by creating the following templates
+in your root template directory: <tt class="docutils literal"><span class="pre">404.html</span></tt>, <tt class="docutils literal"><span class="pre">500.html</span></tt>, <tt class="docutils literal"><span class="pre">403.html</span></tt>, and
+<tt class="docutils literal"><span class="pre">400.html</span></tt>. The default views should suffice for 99% of Web applications, but
+if you desire to customize them, see these instructions which also contain
+details about the default templates:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../../topics/http/views.html#http-not-found-view"><em>The 404 (page not found) view</em></a></li>
+<li><a class="reference internal" href="../../topics/http/views.html#http-internal-server-error-view"><em>The 500 (server error) view</em></a></li>
+<li><a class="reference internal" href="../../topics/http/views.html#http-forbidden-view"><em>The 403 (HTTP Forbidden) view</em></a></li>
+<li><a class="reference internal" href="../../topics/http/views.html#http-bad-request-view"><em>The 400 (bad request) view</em></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="miscellaneous">
+<h2>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="setting-allowed-include-roots">
+<h3><a href="#id55"><span class="problematic" id="id56">:setting:`ALLOWED_INCLUDE_ROOTS`</span></a><a class="headerlink" href="#setting-allowed-include-roots" title="Permalink to this headline">¶</a></h3>
+<p>This setting is required if you&#8217;re using the <a href="#id57"><span class="problematic" id="id58">:ttag:`ssi`</span></a> template tag.</p>
+</div>
+</div>
+<div class="section" id="python-options">
+<h2>Python Options<a class="headerlink" href="#python-options" title="Permalink to this headline">¶</a></h2>
+<p>It&#8217;s strongly recommended that you invoke the Python process running your
+Django application using the <a class="reference external" href="http://docs.python.org/2.7/using/cmdline.html#cmdoption-R">-R</a> option or with the
+<span class="target" id="index-0"></span><a class="reference external" href="http://docs.python.org/using/cmdline.html#envvar-PYTHONHASHSEED" title="(in Python v2.7)"><tt class="xref std std-envvar docutils literal"><span class="pre">PYTHONHASHSEED</span></tt></a> environment variable set to <tt class="docutils literal"><span class="pre">random</span></tt>.</p>
+<p>These options help protect your site from denial-of-service (DoS)
+attacks triggered by carefully crafted inputs. Such an attack can
+drastically increase CPU usage by causing worst-case performance when
+creating <tt class="docutils literal"><span class="pre">dict</span></tt> instances. See <a class="reference external" href="http://www.ocert.org/advisories/ocert-2011-003.html">oCERT advisory #2011-003</a> for more information.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Deployment checklist</a><ul>
+<li><a class="reference internal" href="#critical-settings">Critical settings</a><ul>
+<li><a class="reference internal" href="#setting-secret-key">:setting:`SECRET_KEY`</a></li>
+<li><a class="reference internal" href="#setting-debug">:setting:`DEBUG`</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#environment-specific-settings">Environment-specific settings</a><ul>
+<li><a class="reference internal" href="#setting-allowed-hosts">:setting:`ALLOWED_HOSTS`</a></li>
+<li><a class="reference internal" href="#setting-caches">:setting:`CACHES`</a></li>
+<li><a class="reference internal" href="#setting-databases">:setting:`DATABASES`</a></li>
+<li><a class="reference internal" href="#setting-email-backend-and-related-settings">:setting:`EMAIL_BACKEND` and related settings</a></li>
+<li><a class="reference internal" href="#setting-static-root-and-setting-static-url">:setting:`STATIC_ROOT` and :setting:`STATIC_URL`</a></li>
+<li><a class="reference internal" href="#setting-media-root-and-setting-media-url">:setting:`MEDIA_ROOT` and :setting:`MEDIA_URL`</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#https">HTTPS</a><ul>
+<li><a class="reference internal" href="#setting-csrf-cookie-secure">:setting:`CSRF_COOKIE_SECURE`</a></li>
+<li><a class="reference internal" href="#setting-session-cookie-secure">:setting:`SESSION_COOKIE_SECURE`</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#performance-optimizations">Performance optimizations</a><ul>
+<li><a class="reference internal" href="#setting-conn-max-age">:setting:`CONN_MAX_AGE`</a></li>
+<li><a class="reference internal" href="#setting-template-loaders">:setting:`TEMPLATE_LOADERS`</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#error-reporting">Error reporting</a><ul>
+<li><a class="reference internal" href="#setting-logging">:setting:`LOGGING`</a></li>
+<li><a class="reference internal" href="#setting-admins-and-setting-managers">:setting:`ADMINS` and :setting:`MANAGERS`</a></li>
+<li><a class="reference internal" href="#customize-the-default-error-views">Customize the default error views</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#miscellaneous">Miscellaneous</a><ul>
+<li><a class="reference internal" href="#setting-allowed-include-roots">:setting:`ALLOWED_INCLUDE_ROOTS`</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#python-options">Python Options</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/howto/deployment/checklist.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

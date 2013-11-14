@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installing Spatialite &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installing-spatialite">
+<span id="spatialite"></span><h1>Installing Spatialite<a class="headerlink" href="#installing-spatialite" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://www.gaia-gis.it/fossil/libspatialite">SpatiaLite</a> adds spatial support to SQLite, turning it into a full-featured
+spatial database.</p>
+<p>Check first if you can install Spatialite from system packages or binaries. For
+example, on Debian-based distributions, try to install the <tt class="docutils literal"><span class="pre">spatialite-bin</span></tt>
+package. For Mac OS X, follow the
+<a class="reference internal" href="#spatialite-macosx"><em>specific instructions below</em></a>. For Windows, you may
+find binaries on <a class="reference external" href="http://www.gaia-gis.it/gaia-sins/">Gaia-SINS</a> home page. In any case, you should always
+be able to <a class="reference internal" href="#spatialite-source"><em>install from source</em></a>.</p>
+<p>When you are done with the installation process, skip to <a class="reference internal" href="#create-spatialite-db"><em>Creating a spatial database for SpatiaLite</em></a>.</p>
+<div class="section" id="installing-from-source">
+<span id="spatialite-source"></span><h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="geolibs.html#geospatial-libs"><em>GEOS and PROJ.4</em></a> should be installed prior to building
+SpatiaLite.</p>
+<div class="section" id="sqlite">
+<h3>SQLite<a class="headerlink" href="#sqlite" title="Permalink to this headline">¶</a></h3>
+<p>Check first if SQLite is compiled with the <a class="reference external" href="http://www.sqlite.org/rtree.html">R*Tree module</a>. Run the sqlite3
+command line interface and enter the following query:</p>
+<div class="highlight-python"><pre>sqlite&gt; CREATE VIRTUAL TABLE testrtree USING rtree(id,minX,maxX,minY,maxY);</pre>
+</div>
+<p>If you obtain an error, you will have to recompile SQLite from source. Otherwise,
+just skip this section.</p>
+<p>To install from sources, download the latest amalgamation source archive from
+the <a class="reference external" href="http://www.sqlite.org/download.html">SQLite download page</a>, and extract:</p>
+<div class="highlight-python"><pre>$ wget http://sqlite.org/sqlite-amalgamation-3.6.23.1.tar.gz
+$ tar xzf sqlite-amalgamation-3.6.23.1.tar.gz
+$ cd sqlite-3.6.23.1</pre>
+</div>
+<p>Next, run the <tt class="docutils literal"><span class="pre">configure</span></tt> script &#8211; however the <tt class="docutils literal"><span class="pre">CFLAGS</span></tt> environment variable
+needs to be customized so that SQLite knows to build the R*Tree module:</p>
+<div class="highlight-python"><pre>$ CFLAGS="-DSQLITE_ENABLE_RTREE=1" ./configure
+$ make
+$ sudo make install
+$ cd ..</pre>
+</div>
+</div>
+<div class="section" id="spatialite-library-libspatialite-and-tools-spatialite">
+<span id="spatialitebuild"></span><h3>SpatiaLite library (<tt class="docutils literal"><span class="pre">libspatialite</span></tt>) and tools (<tt class="docutils literal"><span class="pre">spatialite</span></tt>)<a class="headerlink" href="#spatialite-library-libspatialite-and-tools-spatialite" title="Permalink to this headline">¶</a></h3>
+<p>Get the latest SpatiaLite library source and tools bundle from the
+<a class="reference external" href="http://www.gaia-gis.it/gaia-sins/libspatialite-sources/">download page</a>:</p>
+<div class="highlight-python"><pre>$ wget http://www.gaia-gis.it/gaia-sins/libspatialite-sources/libspatialite-amalgamation-2.4.0-5.tar.gz
+$ wget http://www.gaia-gis.it/gaia-sins/spatialite-tools-sources/spatialite-tools-2.4.0-5.tar.gz
+$ tar xzf libspatialite-amalgamation-2.4.0-5.tar.gz
+$ tar xzf spatialite-tools-2.4.0-5.tar.gz</pre>
+</div>
+<p>Prior to attempting to build, please read the important notes below to see if
+customization of the <tt class="docutils literal"><span class="pre">configure</span></tt> command is necessary.  If not, then run the
+<tt class="docutils literal"><span class="pre">configure</span></tt> script, make, and install for the SpatiaLite library:</p>
+<div class="highlight-python"><pre>$ cd libspatialite-amalgamation-2.3.1
+$ ./configure # May need to be modified, see notes below.
+$ make
+$ sudo make install
+$ cd ..</pre>
+</div>
+<p id="spatialite-tools">Finally, do the same for the SpatiaLite tools:</p>
+<div class="highlight-python"><pre>$ cd spatialite-tools-2.3.1
+$ ./configure # May need to be modified, see notes below.
+$ make
+$ sudo make install
+$ cd ..</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If you&#8217;ve installed GEOS and PROJ.4 from binary packages, you will have to specify
+their paths when running the <tt class="docutils literal"><span class="pre">configure</span></tt> scripts for <em>both</em> the library and the
+tools (the configure scripts look, by default, in <tt class="docutils literal"><span class="pre">/usr/local</span></tt>).  For example,
+on Debian/Ubuntu distributions that have GEOS and PROJ.4 packages, the command would be:</p>
+<div class="last highlight-python"><pre>$ ./configure --with-proj-include=/usr/include --with-proj-lib=/usr/lib --with-geos-include=/usr/include --with-geos-lib=/usr/lib</pre>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>For Mac OS X users building from source, the SpatiaLite library <em>and</em> tools
+need to have their <tt class="docutils literal"><span class="pre">target</span></tt> configured:</p>
+<div class="last highlight-python"><pre>$ ./configure --target=macosx</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="mac-os-x-specific-instructions">
+<span id="spatialite-macosx"></span><h2>Mac OS X-specific instructions<a class="headerlink" href="#mac-os-x-specific-instructions" title="Permalink to this headline">¶</a></h2>
+<p>Mac OS X users should follow the instructions in the <a class="reference internal" href="index.html#kyngchaos"><em>KyngChaos packages</em></a> section,
+as it is much easier than building from source.</p>
+<p>When <a class="reference internal" href="#create-spatialite-db"><em>Creating a spatial database for SpatiaLite</em></a>, the <tt class="docutils literal"><span class="pre">spatialite</span></tt> program is required.
+However, instead of attempting to compile the SpatiaLite tools from source,
+download the <a class="reference external" href="http://www.gaia-gis.it/spatialite-2.3.1/binaries.html">SpatiaLite Binaries</a> for OS X, and install <tt class="docutils literal"><span class="pre">spatialite</span></tt> in a
+location available in your <tt class="docutils literal"><span class="pre">PATH</span></tt>.  For example:</p>
+<div class="highlight-python"><pre>$ curl -O http://www.gaia-gis.it/spatialite/spatialite-tools-osx-x86-2.3.1.tar.gz
+$ tar xzf spatialite-tools-osx-x86-2.3.1.tar.gz
+$ cd spatialite-tools-osx-x86-2.3.1/bin
+$ sudo cp spatialite /Library/Frameworks/SQLite3.framework/Programs</pre>
+</div>
+<p>Finally, for GeoDjango to be able to find the KyngChaos SpatiaLite library,
+add the following to your <tt class="docutils literal"><span class="pre">settings.py</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SPATIALITE_LIBRARY_PATH</span><span class="o">=</span><span class="s">&#39;/Library/Frameworks/SQLite3.framework/SQLite3&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-a-spatial-database-for-spatialite">
+<span id="create-spatialite-db"></span><h2>Creating a spatial database for SpatiaLite<a class="headerlink" href="#creating-a-spatial-database-for-spatialite" title="Permalink to this headline">¶</a></h2>
+<p>After you&#8217;ve installed SpatiaLite, you&#8217;ll need to create a number of spatial
+metadata tables in your database in order to perform spatial queries.</p>
+<p>If you&#8217;re using SpatiaLite 2.4 or newer, use the <tt class="docutils literal"><span class="pre">spatialite</span></tt> utility to
+call the <tt class="docutils literal"><span class="pre">InitSpatialMetaData()</span></tt> function, like this:</p>
+<div class="highlight-python"><pre>$ spatialite geodjango.db "SELECT InitSpatialMetaData();"
+the SPATIAL_REF_SYS table already contains some row(s)
+ InitSpatiaMetaData ()error:"table spatial_ref_sys already exists"
+0</pre>
+</div>
+<p>You can safely ignore the error messages shown. When you&#8217;ve done this, you can
+skip the rest of this section.</p>
+<p>If you&#8217;re using SpatiaLite 2.3, you&#8217;ll need to download a
+database-initialization file and execute its SQL queries in your database.</p>
+<p>First, get it from the <a class="reference external" href="http://www.gaia-gis.it/spatialite-2.3.1/resources.html">SpatiaLite Resources</a> page:</p>
+<div class="highlight-python"><pre>$ wget http://www.gaia-gis.it/spatialite-2.3.1/init_spatialite-2.3.sql.gz
+$ gunzip init_spatialite-2.3.sql.gz</pre>
+</div>
+<p>Then, use the <tt class="docutils literal"><span class="pre">spatialite</span></tt> command to initialize a spatial database:</p>
+<div class="highlight-python"><pre>$ spatialite geodjango.db &lt; init_spatialite-2.3.sql</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The parameter <tt class="docutils literal"><span class="pre">geodjango.db</span></tt> is the <em>filename</em> of the SQLite database
+you want to use.  Use the same in the <a href="#id7"><span class="problematic" id="id8">:setting:`DATABASES`</span></a> <tt class="docutils literal"><span class="pre">&quot;name&quot;</span></tt> key
+inside your <tt class="docutils literal"><span class="pre">settings.py</span></tt>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installing Spatialite</a><ul>
+<li><a class="reference internal" href="#installing-from-source">Installing from source</a><ul>
+<li><a class="reference internal" href="#sqlite">SQLite</a></li>
+<li><a class="reference internal" href="#spatialite-library-libspatialite-and-tools-spatialite">SpatiaLite library (<tt class="docutils literal"><span class="pre">libspatialite</span></tt>) and tools (<tt class="docutils literal"><span class="pre">spatialite</span></tt>)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mac-os-x-specific-instructions">Mac OS X-specific instructions</a></li>
+<li><a class="reference internal" href="#creating-a-spatial-database-for-spatialite">Creating a spatial database for SpatiaLite</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../../_sources/ref/contrib/gis/install/spatialite.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

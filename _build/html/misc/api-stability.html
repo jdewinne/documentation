@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>API stability &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="api-stability">
+<h1>API stability<a class="headerlink" href="#api-stability" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="../releases/1.0.html"><em>The release of Django 1.0</em></a> comes with a promise of API
+stability and forwards-compatibility. In a nutshell, this means that code you
+develop against a 1.X version of Django will continue to work with future
+1.X releases. You may need to make minor changes when upgrading the version of
+Django your project uses: see the &#8220;Backwards incompatible changes&#8221; section of
+the <a class="reference internal" href="../releases/index.html"><em>release note</em></a> for the version or versions to which
+you are upgrading.</p>
+<div class="section" id="what-stable-means">
+<h2>What &#8220;stable&#8221; means<a class="headerlink" href="#what-stable-means" title="Permalink to this headline">¶</a></h2>
+<p>In this context, stable means:</p>
+<ul>
+<li><p class="first">All the public APIs (everything in this documentation) will not be moved
+or renamed without providing backwards-compatible aliases.</p>
+</li>
+<li><p class="first">If new features are added to these APIs &#8211; which is quite possible &#8211;
+they will not break or change the meaning of existing methods. In other
+words, &#8220;stable&#8221; does not (necessarily) mean &#8220;complete.&#8221;</p>
+</li>
+<li><p class="first">If, for some reason, an API declared stable must be removed or replaced, it
+will be declared deprecated but will remain in the API for at least two
+minor version releases. Warnings will be issued when the deprecated method
+is called.</p>
+<p>See <a class="reference internal" href="../internals/release-process.html#official-releases"><em>Official releases</em></a> for more details on how Django&#8217;s version
+numbering scheme works, and how features will be deprecated.</p>
+</li>
+<li><p class="first">We&#8217;ll only break backwards compatibility of these APIs if a bug or
+security hole makes it completely unavoidable.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="stable-apis">
+<h2>Stable APIs<a class="headerlink" href="#stable-apis" title="Permalink to this headline">¶</a></h2>
+<p>In general, everything covered in the documentation &#8211; with the exception of
+anything in the <a class="reference internal" href="../internals/index.html"><em>internals area</em></a> is considered stable.</p>
+</div>
+<div class="section" id="exceptions">
+<h2>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
+<p>There are a few exceptions to this stability and backwards-compatibility
+promise.</p>
+<div class="section" id="security-fixes">
+<h3>Security fixes<a class="headerlink" href="#security-fixes" title="Permalink to this headline">¶</a></h3>
+<p>If we become aware of a security problem &#8211; hopefully by someone following our
+<a class="reference internal" href="../internals/security.html#reporting-security-issues"><em>security reporting policy</em></a> &#8211; we&#8217;ll do
+everything necessary to fix it. This might mean breaking backwards
+compatibility; security trumps the compatibility guarantee.</p>
+</div>
+<div class="section" id="apis-marked-as-internal">
+<h3>APIs marked as internal<a class="headerlink" href="#apis-marked-as-internal" title="Permalink to this headline">¶</a></h3>
+<p>Certain APIs are explicitly marked as &#8220;internal&#8221; in a couple of ways:</p>
+<ul class="simple">
+<li>Some documentation refers to internals and mentions them as such. If the
+documentation says that something is internal, we reserve the right to
+change it.</li>
+<li>Functions, methods, and other objects prefixed by a leading underscore
+(<tt class="docutils literal"><span class="pre">_</span></tt>). This is the standard Python way of indicating that something is
+private; if any method starts with a single <tt class="docutils literal"><span class="pre">_</span></tt>, it&#8217;s an internal API.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">API stability</a><ul>
+<li><a class="reference internal" href="#what-stable-means">What &#8220;stable&#8221; means</a></li>
+<li><a class="reference internal" href="#stable-apis">Stable APIs</a></li>
+<li><a class="reference internal" href="#exceptions">Exceptions</a><ul>
+<li><a class="reference internal" href="#security-fixes">Security fixes</a></li>
+<li><a class="reference internal" href="#apis-marked-as-internal">APIs marked as internal</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/misc/api-stability.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>How to use Django with Gunicorn &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="how-to-use-django-with-gunicorn">
+<h1>How to use Django with Gunicorn<a class="headerlink" href="#how-to-use-django-with-gunicorn" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="http://gunicorn.org/">Gunicorn</a> (&#8216;Green Unicorn&#8217;) is a pure-Python WSGI server for UNIX. It has no
+dependencies and is easy to install and use.</p>
+<p>There are two ways to use Gunicorn with Django. One is to have Gunicorn treat
+Django as just another WSGI application. The second is to use Gunicorn&#8217;s
+special <a class="reference external" href="http://gunicorn.org/run.html#django-manage-py">integration with Django</a>.</p>
+<div class="section" id="installing-gunicorn">
+<h2>Installing Gunicorn<a class="headerlink" href="#installing-gunicorn" title="Permalink to this headline">¶</a></h2>
+<p>Installing gunicorn is as easy as <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">gunicorn</span></tt>. For more
+details, see the <a class="reference external" href="http://gunicorn.org/install.html">gunicorn documentation</a>.</p>
+</div>
+<div class="section" id="running-django-in-gunicorn-as-a-generic-wsgi-application">
+<h2>Running Django in Gunicorn as a generic WSGI application<a class="headerlink" href="#running-django-in-gunicorn-as-a-generic-wsgi-application" title="Permalink to this headline">¶</a></h2>
+<p>When Gunicorn is installed, a <tt class="docutils literal"><span class="pre">gunicorn</span></tt> command is available which starts
+the Gunicorn server process. At its simplest, gunicorn just needs to be called
+with a the location of a WSGI application object.:</p>
+<div class="highlight-bash"><div class="highlight"><pre>gunicorn <span class="o">[</span>OPTIONS<span class="o">]</span> APP_MODULE
+</pre></div>
+</div>
+<p>Where <tt class="docutils literal"><span class="pre">APP_MODULE</span></tt> is of the pattern <tt class="docutils literal"><span class="pre">MODULE_NAME:VARIABLE_NAME</span></tt>. The
+module name should be a full dotted path. The variable name refers to a WSGI
+callable that should be found in the specified module.</p>
+<p>So for a typical Django project, invoking gunicorn would look like:</p>
+<div class="highlight-bash"><div class="highlight"><pre>gunicorn myproject.wsgi:application
+</pre></div>
+</div>
+<p>(This requires that your project be on the Python path; the simplest way to
+ensure that is to run this command from the same directory as your
+<tt class="docutils literal"><span class="pre">manage.py</span></tt> file.)</p>
+</div>
+<div class="section" id="using-gunicorn-s-django-integration">
+<h2>Using Gunicorn&#8217;s Django integration<a class="headerlink" href="#using-gunicorn-s-django-integration" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you are using Django 1.4 or newer, it’s highly recommended to simply run
+your application with the WSGI interface using the <tt class="docutils literal"><span class="pre">gunicorn</span></tt> command
+as described above.</p>
+</div>
+<p>To use Gunicorn&#8217;s built-in Django integration, first add <tt class="docutils literal"><span class="pre">&quot;gunicorn&quot;</span></tt> to
+<a href="#id1"><span class="problematic" id="id2">:setting:`INSTALLED_APPS`</span></a>. Then run <tt class="docutils literal"><span class="pre">python</span> <span class="pre">manage.py</span> <span class="pre">run_gunicorn</span></tt>.</p>
+<p>This provides a few Django-specific niceties:</p>
+<ul class="simple">
+<li>sets the gunicorn process name to be that of the project</li>
+<li>validates installed models</li>
+<li>allows an <tt class="docutils literal"><span class="pre">--adminmedia</span></tt> option for passing in the location of the
+admin media files.</li>
+</ul>
+<p>See Gunicorn&#8217;s <a class="reference external" href="http://gunicorn.org/deploy.html">deployment documentation</a> for additional tips on starting and
+maintaining the Gunicorn server.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">How to use Django with Gunicorn</a><ul>
+<li><a class="reference internal" href="#installing-gunicorn">Installing Gunicorn</a></li>
+<li><a class="reference internal" href="#running-django-in-gunicorn-as-a-generic-wsgi-application">Running Django in Gunicorn as a generic WSGI application</a></li>
+<li><a class="reference internal" href="#using-gunicorn-s-django-integration">Using Gunicorn&#8217;s Django integration</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/howto/deployment/wsgi/gunicorn.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

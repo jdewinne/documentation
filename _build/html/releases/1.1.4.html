@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Django 1.1.4 release notes &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="django-1-1-4-release-notes">
+<h1>Django 1.1.4 release notes<a class="headerlink" href="#django-1-1-4-release-notes" title="Permalink to this headline">¶</a></h1>
+<p>Welcome to Django 1.1.4!</p>
+<p>This is the fourth &#8220;bugfix&#8221; release in the Django 1.1 series,
+improving the stability and performance of the Django 1.1 codebase.</p>
+<p>With one exception, Django 1.1.4 maintains backwards compatibility
+with Django 1.1.3. It also contains a number of fixes and other
+improvements. Django 1.1.4 is a recommended upgrade for any
+development or deployment currently using or targeting Django 1.1.</p>
+<p>For full details on the new features, backwards incompatibilities, and
+deprecated features in the 1.1 branch, see the <a class="reference internal" href="1.1.html"><em>Django 1.1 release notes</em></a>.</p>
+<div class="section" id="backwards-incompatible-changes">
+<h2>Backwards incompatible changes<a class="headerlink" href="#backwards-incompatible-changes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="csrf-exception-for-ajax-requests">
+<h3>CSRF exception for AJAX requests<a class="headerlink" href="#csrf-exception-for-ajax-requests" title="Permalink to this headline">¶</a></h3>
+<p>Django includes a CSRF-protection mechanism, which makes use of a
+token inserted into outgoing forms. Middleware then checks for the
+token&#8217;s presence on form submission, and validates it.</p>
+<p>Prior to Django 1.2.5, our CSRF protection made an exception for AJAX
+requests, on the following basis:</p>
+<ul class="simple">
+<li>Many AJAX toolkits add an X-Requested-With header when using
+XMLHttpRequest.</li>
+<li>Browsers have strict same-origin policies regarding
+XMLHttpRequest.</li>
+<li>In the context of a browser, the only way that a custom header
+of this nature can be added is with XMLHttpRequest.</li>
+</ul>
+<p>Therefore, for ease of use, we did not apply CSRF checks to requests
+that appeared to be AJAX on the basis of the X-Requested-With header.
+The Ruby on Rails web framework had a similar exemption.</p>
+<p>Recently, engineers at Google made members of the Ruby on Rails
+development team aware of a combination of browser plugins and
+redirects which can allow an attacker to provide custom HTTP headers
+on a request to any website. This can allow a forged request to appear
+to be an AJAX request, thereby defeating CSRF protection which trusts
+the same-origin nature of AJAX requests.</p>
+<p>Michael Koziarski of the Rails team brought this to our attention, and
+we were able to produce a proof-of-concept demonstrating the same
+vulnerability in Django&#8217;s CSRF handling.</p>
+<p>To remedy this, Django will now apply full CSRF validation to all
+requests, regardless of apparent AJAX origin. This is technically
+backwards-incompatible, but the security risks have been judged to
+outweigh the compatibility concerns in this case.</p>
+<p>Additionally, Django will now accept the CSRF token in the custom HTTP
+header X-CSRFTOKEN, as well as in the form submission itself, for ease
+of use with popular JavaScript toolkits which allow insertion of
+custom headers into all AJAX requests.</p>
+<p>Please see the <a class="reference internal" href="../ref/contrib/csrf.html#csrf-ajax"><em>CSRF docs for example jQuery code</em></a>
+that demonstrates this technique, ensuring that you are looking at the
+documentation for your version of Django, as the exact code necessary
+is different for some older versions of Django.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Django 1.1.4 release notes</a><ul>
+<li><a class="reference internal" href="#backwards-incompatible-changes">Backwards incompatible changes</a><ul>
+<li><a class="reference internal" href="#csrf-exception-for-ajax-requests">CSRF exception for AJAX requests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/releases/1.1.4.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>django.contrib.webdesign &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-django.contrib.webdesign">
+<span id="django-contrib-webdesign"></span><h1>django.contrib.webdesign<a class="headerlink" href="#module-django.contrib.webdesign" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">django.contrib.webdesign</span></tt> package, part of the
+<a class="reference internal" href="index.html"><em>&#8220;django.contrib&#8221; add-ons</em></a>, provides various Django
+helpers that are particularly useful to Web <em>designers</em> (as opposed to
+developers).</p>
+<p>At present, the package contains only a single template tag. If you have ideas
+for Web-designer-friendly functionality in Django, please
+<a class="reference internal" href="../../internals/contributing/index.html"><em>suggest them</em></a>.</p>
+<div class="section" id="template-tags">
+<h2>Template tags<a class="headerlink" href="#template-tags" title="Permalink to this headline">¶</a></h2>
+<p>To use these template tags, add <tt class="docutils literal"><span class="pre">'django.contrib.webdesign'</span></tt> to your
+<a href="#id1"><span class="problematic" id="id2">:setting:`INSTALLED_APPS`</span></a> setting. Once you&#8217;ve done that, use
+<tt class="docutils literal"><span class="pre">{%</span> <span class="pre">load</span> <span class="pre">webdesign</span> <span class="pre">%}</span></tt> in a template to give your template access to the tags.</p>
+</div>
+<div class="section" id="lorem">
+<h2>lorem<a class="headerlink" href="#lorem" title="Permalink to this headline">¶</a></h2>
+<p>Displays random &#8220;lorem ipsum&#8221; Latin text. This is useful for providing sample
+data in templates.</p>
+<p>Usage:</p>
+<div class="highlight-python"><pre>{% lorem [count] [method] [random] %}</pre>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">{%</span> <span class="pre">lorem</span> <span class="pre">%}</span></tt> tag can be used with zero, one, two or three arguments.
+The arguments are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="85%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Argument</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">count</span></tt></td>
+<td>A number (or variable) containing the number of paragraphs or
+words to generate (default is 1).</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">method</span></tt></td>
+<td>Either <tt class="docutils literal"><span class="pre">w</span></tt> for words, <tt class="docutils literal"><span class="pre">p</span></tt> for HTML paragraphs or <tt class="docutils literal"><span class="pre">b</span></tt>
+for plain-text paragraph blocks (default is <tt class="docutils literal"><span class="pre">b</span></tt>).</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">random</span></tt></td>
+<td>The word <tt class="docutils literal"><span class="pre">random</span></tt>, which if given, does not use the common
+paragraph (&#8220;Lorem ipsum dolor sit amet...&#8221;) when generating
+text.</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">{%</span> <span class="pre">lorem</span> <span class="pre">%}</span></tt> will output the common &#8220;lorem ipsum&#8221; paragraph.</li>
+<li><tt class="docutils literal"><span class="pre">{%</span> <span class="pre">lorem</span> <span class="pre">3</span> <span class="pre">p</span> <span class="pre">%}</span></tt> will output the common &#8220;lorem ipsum&#8221; paragraph
+and two random paragraphs each wrapped in HTML <tt class="docutils literal"><span class="pre">&lt;p&gt;</span></tt> tags.</li>
+<li><tt class="docutils literal"><span class="pre">{%</span> <span class="pre">lorem</span> <span class="pre">2</span> <span class="pre">w</span> <span class="pre">random</span> <span class="pre">%}</span></tt> will output two random Latin words.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">django.contrib.webdesign</a><ul>
+<li><a class="reference internal" href="#template-tags">Template tags</a></li>
+<li><a class="reference internal" href="#lorem">lorem</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/ref/contrib/webdesign.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

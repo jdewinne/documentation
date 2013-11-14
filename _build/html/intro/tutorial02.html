@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Writing your first Django app, part 2 &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="writing-your-first-django-app-part-2">
+<h1>Writing your first Django app, part 2<a class="headerlink" href="#writing-your-first-django-app-part-2" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial begins where <a class="reference internal" href="tutorial01.html"><em>Tutorial 1</em></a> left off. We&#8217;re
+continuing the Web-poll application and will focus on Django&#8217;s
+automatically-generated admin site.</p>
+<div class="admonition-philosophy admonition">
+<p class="first admonition-title">Philosophy</p>
+<p>Generating admin sites for your staff or clients to add, change and delete
+content is tedious work that doesn&#8217;t require much creativity. For that
+reason, Django entirely automates creation of admin interfaces for models.</p>
+<p>Django was written in a newsroom environment, with a very clear separation
+between &#8220;content publishers&#8221; and the &#8220;public&#8221; site. Site managers use the
+system to add news stories, events, sports scores, etc., and that content is
+displayed on the public site. Django solves the problem of creating a
+unified interface for site administrators to edit content.</p>
+<p class="last">The admin isn&#8217;t intended to be used by site visitors. It&#8217;s for site
+managers.</p>
+</div>
+<div class="section" id="start-the-development-server">
+<h2>Start the development server<a class="headerlink" href="#start-the-development-server" title="Permalink to this headline">¶</a></h2>
+<p>The Django admin site is activated by default. Let&#8217;s start the development
+server and explore it.</p>
+<p>Recall from Tutorial 1 that you start the development server like so:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>python manage.py runserver
+</pre></div>
+</div>
+<p>Now, open a Web browser and go to &#8220;/admin/&#8221; on your local domain &#8211; e.g.,
+<a class="reference external" href="http://127.0.0.1:8000/admin/">http://127.0.0.1:8000/admin/</a>. You should see the admin&#8217;s login screen:</p>
+<img alt="Django admin login screen" src="../_images/admin01.png" />
+<p>Since <tt class="xref doc docutils literal"><span class="pre">translation</span></tt> is turned on by default,
+the login screen may be displayed in your own language, depending on your
+browser&#8217;s settings and on whether Django has a translation for this language.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Writing your first Django app, part 2</a><ul>
+<li><a class="reference internal" href="#start-the-development-server">Start the development server</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/intro/tutorial02.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

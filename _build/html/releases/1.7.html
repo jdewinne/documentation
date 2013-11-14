@@ -1,0 +1,845 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Django 1.7 release notes - UNDER DEVELOPMENT &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="django-1-7-release-notes-under-development">
+<h1>Django 1.7 release notes - UNDER DEVELOPMENT<a class="headerlink" href="#django-1-7-release-notes-under-development" title="Permalink to this headline">¶</a></h1>
+<p>Welcome to Django 1.7!</p>
+<p>These release notes cover the <a class="reference internal" href="#what-s-new-in-django-1-7">new features</a>, as well as some <a class="reference internal" href="#backwards-incompatible-changes-in-1-7">backwards
+incompatible changes</a> you&#8217;ll want to be aware of when upgrading from Django
+1.6 or older versions. We&#8217;ve also dropped some features, which are detailed in
+<a class="reference internal" href="../internals/deprecation.html"><em>our deprecation plan</em></a>, and we&#8217;ve <a class="reference internal" href="#features-deprecated-in-1-7">begun the
+deprecation process for some features</a>.</p>
+<div class="section" id="python-compatibility">
+<h2>Python compatibility<a class="headerlink" href="#python-compatibility" title="Permalink to this headline">¶</a></h2>
+<p>Django 1.7 requires Python 2.7 or above, though we <strong>highly recommend</strong>
+the latest minor release. Support for Python 2.6 has been dropped.</p>
+<p>This change should affect only a small number of Django users, as most
+operating-system vendors today are shipping Python 2.7 or newer as their default
+version. If you&#8217;re still using Python 2.6, however, you&#8217;ll need to stick to
+Django 1.6 until you can upgrade your Python version. Per <a class="reference internal" href="../internals/release-process.html"><em>our support
+policy</em></a>, Django 1.6 will continue to receive
+security support until the release of Django 1.8.</p>
+</div>
+<div class="section" id="what-s-new-in-django-1-7">
+<h2>What&#8217;s new in Django 1.7<a class="headerlink" href="#what-s-new-in-django-1-7" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="schema-migrations">
+<h3>Schema migrations<a class="headerlink" href="#schema-migrations" title="Permalink to this headline">¶</a></h3>
+<p>Django now has built-in support for schema migrations. It allows models
+to be updated, changed, and deleted by creating migration files that represent
+the model changes and which can be run on any development, staging or production
+database.</p>
+<p>Migrations are covered in <a class="reference internal" href="../topics/migrations.html"><em>their own documentation</em></a>,
+but a few of the key features are:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">syncdb</span></tt> has been deprecated and replaced by <tt class="docutils literal"><span class="pre">migrate</span></tt>. Don&#8217;t worry -
+calls to <tt class="docutils literal"><span class="pre">syncdb</span></tt> will still work as before.</li>
+<li>A new <tt class="docutils literal"><span class="pre">makemigrations</span></tt> command provides an easy way to autodetect changes
+to your models and make migrations for them.</li>
+<li><a class="reference internal" href="../ref/signals.html#django.db.models.signals.pre_syncdb" title="django.db.models.signals.pre_syncdb"><tt class="xref py py-data docutils literal"><span class="pre">pre_syncdb</span></tt></a> and
+<a class="reference internal" href="../ref/signals.html#django.db.models.signals.post_syncdb" title="django.db.models.signals.post_syncdb"><tt class="xref py py-data docutils literal"><span class="pre">post_syncdb</span></tt></a> have been renamed to
+<a class="reference internal" href="../ref/signals.html#django.db.models.signals.pre_migrate" title="django.db.models.signals.pre_migrate"><tt class="xref py py-data docutils literal"><span class="pre">pre_migrate</span></tt></a> and
+<a class="reference internal" href="../ref/signals.html#django.db.models.signals.post_migrate" title="django.db.models.signals.post_migrate"><tt class="xref py py-data docutils literal"><span class="pre">post_migrate</span></tt></a> respectively. The
+<tt class="docutils literal"><span class="pre">create_models</span></tt>/<tt class="docutils literal"><span class="pre">created_models</span></tt> argument has also been deprecated.</li>
+<li>The <tt class="docutils literal"><span class="pre">allow_syncdb</span></tt> method on database routers is now called <tt class="docutils literal"><span class="pre">allow_migrate</span></tt>,
+but still performs the same function. Routers with <tt class="docutils literal"><span class="pre">allow_syncdb</span></tt> methods
+will still work, but that method name is deprecated and you should change
+it as soon as possible (nothing more than renaming is required).</li>
+</ul>
+</div>
+<div class="section" id="new-method-on-field-subclasses">
+<h3>New method on Field subclasses<a class="headerlink" href="#new-method-on-field-subclasses" title="Permalink to this headline">¶</a></h3>
+<p>To help power both schema migrations and composite keys, the <a class="reference internal" href="../howto/custom-model-fields.html#django.db.models.Field" title="django.db.models.Field"><tt class="xref py py-class docutils literal"><span class="pre">Field</span></tt></a> API now
+has a new required method: <tt class="docutils literal"><span class="pre">deconstruct()</span></tt>.</p>
+<p>This method takes no arguments, and returns a tuple of four items:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">name</span></tt>: The field&#8217;s attribute name on its parent model, or None if it is not part of a model</li>
+<li><tt class="docutils literal"><span class="pre">path</span></tt>: A dotted, Python path to the class of this field, including the class name.</li>
+<li><tt class="docutils literal"><span class="pre">args</span></tt>: Positional arguments, as a list</li>
+<li><tt class="docutils literal"><span class="pre">kwargs</span></tt>: Keyword arguments, as a dict</li>
+</ul>
+<p>These four values allow any field to be serialized into a file, as well as
+allowing the field to be copied safely, both essential parts of these new features.</p>
+<p>This change should not affect you unless you write custom Field subclasses;
+if you do, you may need to reimplement the <tt class="docutils literal"><span class="pre">deconstruct()</span></tt> method if your
+subclass changes the method signature of <tt class="docutils literal"><span class="pre">__init__</span></tt> in any way. If your
+field just inherits from a built-in Django field and doesn&#8217;t override <tt class="docutils literal"><span class="pre">__init__</span></tt>,
+no changes are necessary.</p>
+<p>If you do need to override <tt class="docutils literal"><span class="pre">deconstruct()</span></tt>, a good place to start is the
+built-in Django fields (<tt class="docutils literal"><span class="pre">django/db/models/fields/__init__.py</span></tt>) as several
+fields, including <tt class="docutils literal"><span class="pre">DecimalField</span></tt> and <tt class="docutils literal"><span class="pre">DateField</span></tt>, override it and show how
+to call the method on the superclass and simply add or remove extra arguments.</p>
+</div>
+<div class="section" id="calling-custom-queryset-methods-from-the-manager">
+<h3>Calling custom <tt class="docutils literal"><span class="pre">QuerySet</span></tt> methods from the <tt class="docutils literal"><span class="pre">Manager</span></tt><a class="headerlink" href="#calling-custom-queryset-methods-from-the-manager" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../ref/models/querysets.html#django.db.models.query.QuerySet.as_manager" title="django.db.models.query.QuerySet.as_manager"><tt class="xref py py-meth docutils literal"><span class="pre">QuerySet.as_manager()</span></tt></a>
+class method has been added to <a class="reference internal" href="../topics/db/managers.html#create-manager-with-queryset-methods"><em>create Manager with QuerySet methods</em></a>.</p>
+</div>
+<div class="section" id="using-a-custom-manager-when-traversing-reverse-relations">
+<h3>Using a custom manager when traversing reverse relations<a class="headerlink" href="#using-a-custom-manager-when-traversing-reverse-relations" title="Permalink to this headline">¶</a></h3>
+<p>It is now possible to <a class="reference internal" href="../topics/db/queries.html#using-custom-reverse-manager"><em>specify a custom manager</em></a> when traversing a reverse relationship.</p>
+</div>
+<div class="section" id="new-prefetch-object-for-advanced-prefetch-related-operations">
+<h3>New <tt class="docutils literal"><span class="pre">Prefetch</span></tt> object for advanced <tt class="docutils literal"><span class="pre">prefetch_related</span></tt> operations.<a class="headerlink" href="#new-prefetch-object-for-advanced-prefetch-related-operations" title="Permalink to this headline">¶</a></h3>
+<p>The new <a class="reference internal" href="../ref/models/queries.html#django.db.models.Prefetch" title="django.db.models.Prefetch"><tt class="xref py py-class docutils literal"><span class="pre">Prefetch</span></tt></a> object allows customizing
+prefetch operations.</p>
+<p>You can specify the <tt class="docutils literal"><span class="pre">QuerySet</span></tt> used to traverse a given relation
+or customize the storage location of prefetch results.</p>
+<p>This enables things like filtering prefetched relations, calling
+<a class="reference internal" href="../ref/models/querysets.html#django.db.models.query.QuerySet.select_related" title="django.db.models.query.QuerySet.select_related"><tt class="xref py py-meth docutils literal"><span class="pre">select_related()</span></tt></a> from a prefetched
+relation, or prefetching the same relation multiple times with different
+querysets. See <a class="reference internal" href="../ref/models/querysets.html#django.db.models.query.QuerySet.prefetch_related" title="django.db.models.query.QuerySet.prefetch_related"><tt class="xref py py-meth docutils literal"><span class="pre">prefetch_related()</span></tt></a>
+for more details.</p>
+</div>
+<div class="section" id="admin-shortcuts-support-time-zones">
+<h3>Admin shortcuts support time zones<a class="headerlink" href="#admin-shortcuts-support-time-zones" title="Permalink to this headline">¶</a></h3>
+<p>The &#8220;today&#8221; and &#8220;now&#8221; shortcuts next to date and time input widgets in the
+admin are now operating in the <a class="reference internal" href="../topics/i18n/timezones.html#default-current-time-zone"><em>current time zone</em></a>. Previously, they used the browser time zone,
+which could result in saving the wrong value when it didn&#8217;t match the current
+time zone on the server.</p>
+<p>In addition, the widgets now display a help message when the browser and
+server time zone are different, to clarify how the value inserted in the field
+will be interpreted.</p>
+</div>
+<div class="section" id="using-database-cursors-as-context-managers">
+<h3>Using database cursors as context managers<a class="headerlink" href="#using-database-cursors-as-context-managers" title="Permalink to this headline">¶</a></h3>
+<p>Prior to Python 2.7, database cursors could be used as a context manager. The
+specific backend&#8217;s cursor defined the behavior of the context manager. The
+behavior of magic method lookups was changed with Python 2.7 and cursors were
+no longer usable as context managers.</p>
+<p>Django 1.7 allows a cursor to be used as a context manager that is a shortcut
+for the following, instead of backend specific behavior.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="minor-features">
+<h3>Minor features<a class="headerlink" href="#minor-features" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="django-contrib-admin">
+<h4><a class="reference internal" href="../ref/contrib/admin/index.html#module-django.contrib.admin" title="django.contrib.admin: Django's admin site."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.admin</span></tt></a><a class="headerlink" href="#django-contrib-admin" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>You can now implement <a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.AdminSite.site_header" title="django.contrib.admin.AdminSite.site_header"><tt class="xref py py-attr docutils literal"><span class="pre">site_header</span></tt></a>,
+<a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.AdminSite.site_title" title="django.contrib.admin.AdminSite.site_title"><tt class="xref py py-attr docutils literal"><span class="pre">site_title</span></tt></a>, and
+<a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.AdminSite.index_title" title="django.contrib.admin.AdminSite.index_title"><tt class="xref py py-attr docutils literal"><span class="pre">index_title</span></tt></a> attributes on a custom
+<a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.AdminSite" title="django.contrib.admin.AdminSite"><tt class="xref py py-class docutils literal"><span class="pre">AdminSite</span></tt></a> in order to easily change the admin
+site&#8217;s page title and header text. No more needing to override templates!</li>
+<li>Buttons in <a class="reference internal" href="../ref/contrib/admin/index.html#module-django.contrib.admin" title="django.contrib.admin: Django's admin site."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.admin</span></tt></a> now use the <tt class="docutils literal"><span class="pre">border-radius</span></tt> CSS
+property for rounded corners rather than GIF background images.</li>
+<li>Some admin templates now have <tt class="docutils literal"><span class="pre">app-&lt;app_name&gt;</span></tt> and <tt class="docutils literal"><span class="pre">model-&lt;model_name&gt;</span></tt>
+classes in their <tt class="docutils literal"><span class="pre">&lt;body&gt;</span></tt> tag to allow customizing the CSS per app or per
+model.</li>
+<li>The admin changelist cells now have a <tt class="docutils literal"><span class="pre">field-&lt;field_name&gt;</span></tt> class in the
+HTML to enable style customizations.</li>
+<li>The admin&#8217;s search fields can now be customized per-request thanks to the new
+<a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.ModelAdmin.get_search_fields" title="django.contrib.admin.ModelAdmin.get_search_fields"><tt class="xref py py-meth docutils literal"><span class="pre">django.contrib.admin.ModelAdmin.get_search_fields()</span></tt></a> method.</li>
+<li>The <a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.ModelAdmin.get_fields" title="django.contrib.admin.ModelAdmin.get_fields"><tt class="xref py py-meth docutils literal"><span class="pre">ModelAdmin.get_fields()</span></tt></a> method may be overridden to
+customize the value of <a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.ModelAdmin.fields" title="django.contrib.admin.ModelAdmin.fields"><tt class="xref py py-attr docutils literal"><span class="pre">ModelAdmin.fields</span></tt></a>.</li>
+<li>In addition to the existing <tt class="docutils literal"><span class="pre">admin.site.register</span></tt> syntax, you can use the
+new <a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.register" title="django.contrib.admin.register"><tt class="xref py py-func docutils literal"><span class="pre">register()</span></tt></a> decorator to register a
+<a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.ModelAdmin" title="django.contrib.admin.ModelAdmin"><tt class="xref py py-class docutils literal"><span class="pre">ModelAdmin</span></tt></a>.</li>
+<li>You may specify <a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.ModelAdmin.list_display_links" title="django.contrib.admin.ModelAdmin.list_display_links"><tt class="xref py py-meth docutils literal"><span class="pre">ModelAdmin.list_display_links</span></tt></a> <tt class="docutils literal"><span class="pre">=</span> <span class="pre">None</span></tt> to disable
+links on the change list page grid.</li>
+<li>You may now specify <a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.ModelAdmin.view_on_site" title="django.contrib.admin.ModelAdmin.view_on_site"><tt class="xref py py-attr docutils literal"><span class="pre">ModelAdmin.view_on_site</span></tt></a> to control whether or not to
+display the &#8220;View on site&#8221; link.</li>
+</ul>
+</div>
+<div class="section" id="django-contrib-auth">
+<h4><a class="reference internal" href="../topics/auth/index.html#module-django.contrib.auth" title="django.contrib.auth: Django's authentication framework."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.auth</span></tt></a><a class="headerlink" href="#django-contrib-auth" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Any <tt class="docutils literal"><span class="pre">**kwargs</span></tt> passed to
+<a class="reference internal" href="../ref/contrib/auth.html#django.contrib.auth.models.User.email_user" title="django.contrib.auth.models.User.email_user"><tt class="xref py py-meth docutils literal"><span class="pre">email_user()</span></tt></a> are passed to the
+underlying <a class="reference internal" href="../topics/email.html#django.core.mail.send_mail" title="django.core.mail.send_mail"><tt class="xref py py-meth docutils literal"><span class="pre">send_mail()</span></tt></a> call.</li>
+<li>The <a class="reference internal" href="../topics/auth/default.html#django.contrib.auth.decorators.permission_required" title="django.contrib.auth.decorators.permission_required"><tt class="xref py py-func docutils literal"><span class="pre">permission_required()</span></tt></a> decorator can
+take a list of permissions as well as a single permission.</li>
+<li>You can override the new <a class="reference internal" href="../topics/auth/default.html#django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed" title="django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed"><tt class="xref py py-meth docutils literal"><span class="pre">AuthenticationForm.confirm_login_allowed()</span></tt></a> method
+to more easily customize the login policy.</li>
+<li><a class="reference internal" href="../topics/auth/default.html#django.contrib.auth.views.password_reset" title="django.contrib.auth.views.password_reset"><tt class="xref py py-func docutils literal"><span class="pre">django.contrib.auth.views.password_reset()</span></tt></a> takes an optional
+<tt class="docutils literal"><span class="pre">html_email_template_name</span></tt> parameter used to send a multipart HTML email
+for password resets.</li>
+</ul>
+</div>
+<div class="section" id="django-contrib-gis">
+<h4><a class="reference internal" href="../ref/contrib/gis/index.html#module-django.contrib.gis" title="django.contrib.gis: Geographic Information System (GIS) extensions for Django"><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.gis</span></tt></a><a class="headerlink" href="#django-contrib-gis" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>The default OpenLayers library version included in widgets has been updated
+from 2.11 to 2.13.</li>
+</ul>
+</div>
+<div class="section" id="django-contrib-messages">
+<h4><a class="reference internal" href="../ref/contrib/messages.html#module-django.contrib.messages" title="django.contrib.messages: Provides cookie- and session-based temporary message storage."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.messages</span></tt></a><a class="headerlink" href="#django-contrib-messages" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>The backends for <a class="reference internal" href="../ref/contrib/messages.html#module-django.contrib.messages" title="django.contrib.messages: Provides cookie- and session-based temporary message storage."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.messages</span></tt></a> that use cookies, will now
+follow the <a href="#id1"><span class="problematic" id="id2">:setting:`SESSION_COOKIE_SECURE`</span></a> and
+<a href="#id3"><span class="problematic" id="id4">:setting:`SESSION_COOKIE_HTTPONLY`</span></a> settings.</li>
+<li>The <a class="reference internal" href="../ref/contrib/messages.html#message-displaying"><em>messages context processor</em></a> now adds a
+dictionary of default levels under the name <tt class="docutils literal"><span class="pre">DEFAULT_MESSAGE_LEVELS</span></tt>.</li>
+<li><a class="reference internal" href="../ref/contrib/messages.html#django.contrib.messages.storage.base.Message" title="django.contrib.messages.storage.base.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> objects now have a
+<tt class="docutils literal"><span class="pre">level_tag</span></tt> attribute that contains the string representation of the
+message level.</li>
+</ul>
+</div>
+<div class="section" id="django-contrib-redirects">
+<h4><a class="reference internal" href="../ref/contrib/redirects.html#module-django.contrib.redirects" title="django.contrib.redirects: A framework for managing redirects."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.redirects</span></tt></a><a class="headerlink" href="#django-contrib-redirects" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference internal" href="../ref/contrib/redirects.html#django.contrib.redirects.middleware.RedirectFallbackMiddleware" title="django.contrib.redirects.middleware.RedirectFallbackMiddleware"><tt class="xref py py-class docutils literal"><span class="pre">RedirectFallbackMiddleware</span></tt></a>
+has two new attributes
+(<a class="reference internal" href="../ref/contrib/redirects.html#django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_gone_class" title="django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_gone_class"><tt class="xref py py-attr docutils literal"><span class="pre">response_gone_class</span></tt></a>
+and
+<a class="reference internal" href="../ref/contrib/redirects.html#django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_redirect_class" title="django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_redirect_class"><tt class="xref py py-attr docutils literal"><span class="pre">response_redirect_class</span></tt></a>)
+that specify the types of <a class="reference internal" href="../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> instances the
+middleware returns.</li>
+</ul>
+</div>
+<div class="section" id="django-contrib-sessions">
+<h4><a class="reference internal" href="../topics/http/sessions.html#module-django.contrib.sessions" title="django.contrib.sessions: Provides session management for Django projects."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.sessions</span></tt></a><a class="headerlink" href="#django-contrib-sessions" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>The <tt class="docutils literal"><span class="pre">&quot;django.contrib.sessions.backends.cached_db&quot;</span></tt> session backend now
+respects <a href="#id5"><span class="problematic" id="id6">:setting:`SESSION_CACHE_ALIAS`</span></a>. In previous versions, it always used
+the <cite>default</cite> cache.</li>
+</ul>
+</div>
+<div class="section" id="django-contrib-sitemaps">
+<h4><a class="reference internal" href="../ref/contrib/sitemaps.html#module-django.contrib.sitemaps" title="django.contrib.sitemaps: A framework for generating Google sitemap XML files."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.sitemaps</span></tt></a><a class="headerlink" href="#django-contrib-sitemaps" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>The <a class="reference internal" href="../ref/contrib/sitemaps.html#module-django.contrib.sitemaps" title="django.contrib.sitemaps: A framework for generating Google sitemap XML files."><tt class="xref py py-mod docutils literal"><span class="pre">sitemap</span> <span class="pre">framework</span></tt></a> now makes use of
+<a class="reference internal" href="../ref/contrib/sitemaps.html#django.contrib.sitemaps.Sitemap.lastmod" title="django.contrib.sitemaps.Sitemap.lastmod"><tt class="xref py py-attr docutils literal"><span class="pre">lastmod</span></tt></a> to set a <tt class="docutils literal"><span class="pre">Last-Modified</span></tt>
+header in the response. This makes it possible for the
+<a class="reference internal" href="../ref/middleware.html#django.middleware.http.ConditionalGetMiddleware" title="django.middleware.http.ConditionalGetMiddleware"><tt class="xref py py-class docutils literal"><span class="pre">ConditionalGetMiddleware</span></tt></a> to handle
+conditional <tt class="docutils literal"><span class="pre">GET</span></tt> requests for sitemaps which set <tt class="docutils literal"><span class="pre">lastmod</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="django-contrib-staticfiles">
+<h4><a class="reference internal" href="../ref/contrib/staticfiles.html#module-django.contrib.staticfiles" title="django.contrib.staticfiles: An app for handling static files."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.staticfiles</span></tt></a><a class="headerlink" href="#django-contrib-staticfiles" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>The <a class="reference internal" href="../ref/contrib/staticfiles.html#staticfiles-storages"><em>static files storage classes</em></a> may be
+subclassed to override the permissions that collected static files receive by
+setting the
+<a class="reference internal" href="../ref/files/storage.html#django.core.files.storage.FileSystemStorage.file_permissions_mode" title="django.core.files.storage.FileSystemStorage.file_permissions_mode"><tt class="xref py py-attr docutils literal"><span class="pre">file_permissions_mode</span></tt></a>
+parameter. See <a href="#id7"><span class="problematic" id="id8">:djadmin:`collectstatic`</span></a> for example usage.</li>
+</ul>
+</div>
+<div class="section" id="django-contrib-syndication">
+<h4><a class="reference internal" href="../ref/contrib/syndication.html#module-django.contrib.syndication" title="django.contrib.syndication: A framework for generating syndication feeds, in RSS and Atom, quite easily."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.syndication</span></tt></a><a class="headerlink" href="#django-contrib-syndication" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>The <a class="reference internal" href="../ref/utils.html#django.utils.feedgenerator.Atom1Feed" title="django.utils.feedgenerator.Atom1Feed"><tt class="xref py py-class docutils literal"><span class="pre">Atom1Feed</span></tt></a> syndication feed&#8217;s
+<tt class="docutils literal"><span class="pre">updated</span></tt> element now utilizes <tt class="docutils literal"><span class="pre">updateddate</span></tt> instead of <tt class="docutils literal"><span class="pre">pubdate</span></tt>,
+allowing the <tt class="docutils literal"><span class="pre">published</span></tt> element to be included in the feed (which
+relies on <tt class="docutils literal"><span class="pre">pubdate</span></tt>).</li>
+</ul>
+</div>
+<div class="section" id="email">
+<h4>Email<a class="headerlink" href="#email" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference internal" href="../topics/email.html#django.core.mail.send_mail" title="django.core.mail.send_mail"><tt class="xref py py-func docutils literal"><span class="pre">send_mail()</span></tt></a> now accepts an <tt class="docutils literal"><span class="pre">html_message</span></tt>
+parameter for sending a multipart <tt class="docutils literal"><span class="pre">text/plain</span></tt> and <tt class="docutils literal"><span class="pre">text/html</span></tt> email.</li>
+<li>The SMTP <a class="reference internal" href="../topics/email.html#django.core.mail.backends.smtp.EmailBackend" title="django.core.mail.backends.smtp.EmailBackend"><tt class="xref py py-class docutils literal"><span class="pre">EmailBackend</span></tt></a> now accepts a
+<a class="reference internal" href="../topics/email.html#django.core.mail.backends.smtp.EmailBackend.timeout" title="django.core.mail.backends.smtp.EmailBackend.timeout"><tt class="xref py py-attr docutils literal"><span class="pre">timeout</span></tt></a> parameter.</li>
+</ul>
+</div>
+<div class="section" id="file-uploads">
+<h4>File Uploads<a class="headerlink" href="#file-uploads" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>The new <a class="reference internal" href="../topics/http/file-uploads.html#django.core.files.uploadedfile.UploadedFile.content_type_extra" title="django.core.files.uploadedfile.UploadedFile.content_type_extra"><tt class="xref py py-attr docutils literal"><span class="pre">UploadedFile.content_type_extra</span></tt></a> attribute
+contains extra parameters passed to the <tt class="docutils literal"><span class="pre">content-type</span></tt> header on a file
+upload.</li>
+<li>The new <a href="#id9"><span class="problematic" id="id10">:setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`</span></a> setting controls
+the file system permissions of directories created during file upload, like
+<a href="#id11"><span class="problematic" id="id12">:setting:`FILE_UPLOAD_PERMISSIONS`</span></a> does for the files themselves.</li>
+<li>The <a class="reference internal" href="../ref/models/fields.html#django.db.models.FileField.upload_to" title="django.db.models.FileField.upload_to"><tt class="xref py py-attr docutils literal"><span class="pre">FileField.upload_to</span></tt></a>
+attribute is now optional. If it is omitted or given <tt class="docutils literal"><span class="pre">None</span></tt> or an empty
+string, a subdirectory won&#8217;t be used for storing the uploaded files.</li>
+</ul>
+</div>
+<div class="section" id="forms">
+<h4>Forms<a class="headerlink" href="#forms" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>The <tt class="docutils literal"><span class="pre">&lt;label&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;input&gt;</span></tt> tags rendered by
+<a class="reference internal" href="../ref/forms/widgets.html#django.forms.RadioSelect" title="django.forms.RadioSelect"><tt class="xref py py-class docutils literal"><span class="pre">RadioSelect</span></tt></a> and
+<a class="reference internal" href="../ref/forms/widgets.html#django.forms.CheckboxSelectMultiple" title="django.forms.CheckboxSelectMultiple"><tt class="xref py py-class docutils literal"><span class="pre">CheckboxSelectMultiple</span></tt></a> when looping over the radio
+buttons or checkboxes now include <tt class="docutils literal"><span class="pre">for</span></tt> and <tt class="docutils literal"><span class="pre">id</span></tt> attributes, respectively.
+Each radio button or checkbox includes an <tt class="docutils literal"><span class="pre">id_for_label</span></tt> attribute to
+output the element&#8217;s ID.</li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.choices" title="django.db.models.Field.choices"><tt class="xref py py-attr docutils literal"><span class="pre">Field.choices</span></tt></a> now allows you to
+customize the &#8220;empty choice&#8221; label by including a tuple with an empty string
+or <tt class="docutils literal"><span class="pre">None</span></tt> for the key and the custom label as the value. The default blank
+option <tt class="docutils literal"><span class="pre">&quot;----------&quot;</span></tt> will be omitted in this case.</li>
+<li><a class="reference internal" href="../ref/forms/fields.html#django.forms.MultiValueField" title="django.forms.MultiValueField"><tt class="xref py py-class docutils literal"><span class="pre">MultiValueField</span></tt></a> allows optional subfields by setting
+the <tt class="docutils literal"><span class="pre">require_all_fields</span></tt> argument to <tt class="docutils literal"><span class="pre">False</span></tt>. The <tt class="docutils literal"><span class="pre">required</span></tt> attribute
+for each individual field will be respected, and a new <tt class="docutils literal"><span class="pre">incomplete</span></tt>
+validation error will be raised when any required fields are empty.</li>
+<li>The <a class="reference internal" href="../ref/forms/validation.html#django.forms.Form.clean" title="django.forms.Form.clean"><tt class="xref py py-meth docutils literal"><span class="pre">clean()</span></tt></a> method on a form no longer needs to
+return <tt class="docutils literal"><span class="pre">self.cleaned_data</span></tt>. If it does return a changed dictionary then
+that will still be used.</li>
+<li><a class="reference internal" href="../ref/forms/widgets.html#django.forms.extras.widgets.SelectDateWidget.months" title="django.forms.extras.widgets.SelectDateWidget.months"><tt class="xref py py-attr docutils literal"><span class="pre">SelectDateWidget.months</span></tt></a> can be used to
+customize the wording of the months displayed in the select widget.</li>
+<li>The <tt class="docutils literal"><span class="pre">min_num</span></tt> and <tt class="docutils literal"><span class="pre">validate_min</span></tt> parameters were added to
+<a class="reference internal" href="../ref/forms/formsets.html#django.forms.formsets.formset_factory" title="django.forms.formsets.formset_factory"><tt class="xref py py-func docutils literal"><span class="pre">formset_factory()</span></tt></a> to allow validating
+a minimum number of submitted forms.</li>
+<li>The metaclasses used by <tt class="docutils literal"><span class="pre">Form</span></tt> and <tt class="docutils literal"><span class="pre">ModelForm</span></tt> have been reworked to
+support more inheritance scenarios. The previous limitation that prevented
+inheriting from both <tt class="docutils literal"><span class="pre">Form</span></tt> and <tt class="docutils literal"><span class="pre">ModelForm</span></tt> simultaneously have been
+removed as long as <tt class="docutils literal"><span class="pre">ModelForm</span></tt> appears first in the MRO.</li>
+<li>It&#8217;s now possible to opt-out from a <tt class="docutils literal"><span class="pre">Form</span></tt> field declared in a parent class
+by shadowing it with a non-<tt class="docutils literal"><span class="pre">Field</span></tt> value.</li>
+</ul>
+</div>
+<div class="section" id="internationalization">
+<h4>Internationalization<a class="headerlink" href="#internationalization" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>The <a class="reference internal" href="../ref/middleware.html#django.middleware.locale.LocaleMiddleware.response_redirect_class" title="django.middleware.locale.LocaleMiddleware.response_redirect_class"><tt class="xref py py-attr docutils literal"><span class="pre">django.middleware.locale.LocaleMiddleware.response_redirect_class</span></tt></a>
+attribute allows you to customize the redirects issued by the middleware.</li>
+<li>The <a class="reference internal" href="../ref/middleware.html#django.middleware.locale.LocaleMiddleware" title="django.middleware.locale.LocaleMiddleware"><tt class="xref py py-class docutils literal"><span class="pre">LocaleMiddleware</span></tt></a> now stores the user&#8217;s
+selected language with the session key <tt class="docutils literal"><span class="pre">_language</span></tt>. Previously it was
+stored with the key <tt class="docutils literal"><span class="pre">django_language</span></tt>, but keys reserved for Django should
+start with an underscore. For backwards compatibility <tt class="docutils literal"><span class="pre">django_language</span></tt> is
+still read from in 1.7. Sessions will be migrated to the new <tt class="docutils literal"><span class="pre">_language</span></tt>
+key as they are written.</li>
+<li>The <a href="#id13"><span class="problematic" id="id14">:ttag:`blocktrans`</span></a> now supports a <tt class="docutils literal"><span class="pre">trimmed</span></tt> option. This
+option will remove newline characters from the beginning and the end of the
+content of the <tt class="docutils literal"><span class="pre">{%</span> <span class="pre">blocktrans</span> <span class="pre">%}</span></tt> tag, replace any whitespace at the
+beginning and end of a line and merge all lines into one using a space
+character to separate them. This is quite useful for indenting the content of
+a <tt class="docutils literal"><span class="pre">{%</span> <span class="pre">blocktrans</span> <span class="pre">%}</span></tt> tag without having the indentation characters end up
+in the corresponding entry in the PO file, which makes the translation
+process easier.</li>
+</ul>
+</div>
+<div class="section" id="management-commands">
+<h4>Management Commands<a class="headerlink" href="#management-commands" title="Permalink to this headline">¶</a></h4>
+<ul>
+<li><p class="first">The <a href="#id15"><span class="problematic" id="id16">:djadminopt:`&#8211;no-color`</span></a> option for <tt class="docutils literal"><span class="pre">django-admin.py</span></tt> allows you to
+disable the colorization of management command output.</p>
+</li>
+<li><p class="first">The new <a href="#id17"><span class="problematic" id="id18">:djadminopt:`&#8211;natural-foreign`</span></a> and <a href="#id19"><span class="problematic" id="id20">:djadminopt:`&#8211;natural-primary`</span></a>
+options for <a href="#id21"><span class="problematic" id="id22">:djadmin:`dumpdata`</span></a>, and the new <tt class="docutils literal"><span class="pre">use_natural_foreign_keys</span></tt> and
+<tt class="docutils literal"><span class="pre">use_natural_primary_keys</span></tt> arguments for <tt class="docutils literal"><span class="pre">serializers.serialize()</span></tt>, allow
+the use of natural primary keys when serializing.</p>
+</li>
+<li><p class="first">It is no longer necessary to provide the cache table name or the
+<a href="#id23"><span class="problematic" id="id24">:djadminopt:`&#8211;database`</span></a> option for the <a href="#id25"><span class="problematic" id="id26">:djadmin:`createcachetable`</span></a> command.
+Django takes this information from your settings file. If you have configured
+multiple caches or multiple databases, all cache tables are created.</p>
+</li>
+<li><p class="first">The <a href="#id27"><span class="problematic" id="id28">:djadmin:`runserver`</span></a> command received several improvements:</p>
+<dl class="docutils">
+<dt># On BSD systems, including OS X, the development server will reload</dt>
+<dd><p class="first last">immediately when a file is changed. Previously, it polled the filesystem
+for changes every second. That caused a small delay before reloads and
+reduced battery life on laptops.</p>
+</dd>
+</dl>
+<ul class="simple">
+<li>On Linux, the same improvements are available when <a class="reference external" href="https://pypi.python.org/pypi/pyinotify">pyinotify</a> is
+installed.</li>
+<li>In addition, the development server automatically reloads when a
+translation file is updated, i.e. after running
+<a href="#id29"><span class="problematic" id="id30">:djadmin:`compilemessages`</span></a>.</li>
+<li>All HTTP requests are logged to the console, including requests for static
+files or <tt class="docutils literal"><span class="pre">favicon.ico</span></tt> that used to be filtered out.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="models">
+<h4>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>The <a class="reference internal" href="../ref/models/querysets.html#django.db.models.query.QuerySet.update_or_create" title="django.db.models.query.QuerySet.update_or_create"><tt class="xref py py-meth docutils literal"><span class="pre">QuerySet.update_or_create()</span></tt></a> method was added.</li>
+<li>The new <a class="reference internal" href="../ref/models/options.html#django.db.models.Options.default_permissions" title="django.db.models.Options.default_permissions"><tt class="xref py py-attr docutils literal"><span class="pre">default_permissions</span></tt></a> model
+<tt class="docutils literal"><span class="pre">Meta</span></tt> option allows you to customize (or disable) creation of the default
+add, change, and delete permissions.</li>
+<li><a class="reference internal" href="../ref/models/options.html#django.db.models.Options.app_label" title="django.db.models.Options.app_label"><tt class="xref py py-attr docutils literal"><span class="pre">app_label</span></tt></a> is no longer required for models
+that are defined in a <tt class="docutils literal"><span class="pre">models</span></tt> package within an app.</li>
+<li>Explicit <a class="reference internal" href="../ref/models/fields.html#django.db.models.OneToOneField" title="django.db.models.OneToOneField"><tt class="xref py py-class docutils literal"><span class="pre">OneToOneField</span></tt></a> for
+<a class="reference internal" href="../topics/db/models.html#multi-table-inheritance"><em>Multi-table inheritance</em></a> are now discovered in abstract classes.</li>
+<li>Is it now possible to avoid creating a backward relation for
+<a class="reference internal" href="../ref/models/fields.html#django.db.models.OneToOneField" title="django.db.models.OneToOneField"><tt class="xref py py-class docutils literal"><span class="pre">OneToOneField</span></tt></a> by setting its
+<a class="reference internal" href="../ref/models/fields.html#django.db.models.ForeignKey.related_name" title="django.db.models.ForeignKey.related_name"><tt class="xref py py-attr docutils literal"><span class="pre">related_name</span></tt></a> to
+<cite>&#8216;+&#8217;</cite> or ending it with <cite>&#8216;+&#8217;</cite>.</li>
+<li><a class="reference internal" href="../ref/models/queries.html#django.db.models.F" title="django.db.models.F"><tt class="xref py py-class docutils literal"><span class="pre">F</span> <span class="pre">expressions</span></tt></a> support the power operator
+(<tt class="docutils literal"><span class="pre">**</span></tt>).</li>
+</ul>
+</div>
+<div class="section" id="signals">
+<h4>Signals<a class="headerlink" href="#signals" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>The <tt class="docutils literal"><span class="pre">enter</span></tt> argument was added to the
+<a class="reference internal" href="../ref/signals.html#django.test.signals.setting_changed" title="django.test.signals.setting_changed"><tt class="xref py py-data docutils literal"><span class="pre">setting_changed</span></tt></a> signal.</li>
+</ul>
+</div>
+<div class="section" id="templates">
+<h4>Templates<a class="headerlink" href="#templates" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>The <a class="reference internal" href="../ref/templates/api.html#django.template.Context.push" title="django.template.Context.push"><tt class="xref py py-meth docutils literal"><span class="pre">Context.push()</span></tt></a> method now returns
+a context manager which automatically calls <a class="reference internal" href="../ref/templates/api.html#django.template.Context.pop" title="django.template.Context.pop"><tt class="xref py py-meth docutils literal"><span class="pre">pop()</span></tt></a> upon exiting the <tt class="docutils literal"><span class="pre">with</span></tt> statement.
+Additionally, <a class="reference internal" href="../ref/templates/api.html#django.template.Context.push" title="django.template.Context.push"><tt class="xref py py-meth docutils literal"><span class="pre">push()</span></tt></a> now accepts
+parameters that are passed to the <tt class="docutils literal"><span class="pre">dict</span></tt> constructor used to build the new
+context level.</li>
+<li>The <a href="#id31"><span class="problematic" id="id32">:ttag:`widthratio`</span></a> template tag now accepts an &#8220;as&#8221; parameter to capture
+the result in a variable.</li>
+<li>The <a href="#id33"><span class="problematic" id="id34">:ttag:`include`</span></a> template tag will now also accept anything with a
+<tt class="docutils literal"><span class="pre">render()</span></tt> method (such as a <tt class="docutils literal"><span class="pre">Template</span></tt>) as an argument. String
+arguments will be looked up using
+<a class="reference internal" href="../ref/templates/api.html#django.template.loader.get_template" title="django.template.loader.get_template"><tt class="xref py py-func docutils literal"><span class="pre">get_template()</span></tt></a> as always.</li>
+<li>It is now possible to <a href="#id35"><span class="problematic" id="id36">:ttag:`include`</span></a> templates recursively.</li>
+<li>Template objects now have an origin attribute set when
+<a href="#id37"><span class="problematic" id="id38">:setting:`TEMPLATE_DEBUG`</span></a> is <tt class="docutils literal"><span class="pre">True</span></tt>. This allows template origins to be
+inspected and logged outside of the <tt class="docutils literal"><span class="pre">django.template</span></tt> infrastructure.</li>
+<li><tt class="docutils literal"><span class="pre">TypeError</span></tt> exceptions are no longer silenced when raised during the
+rendering of a template.</li>
+<li>The following functions now accept a <tt class="docutils literal"><span class="pre">dirs</span></tt> parameter which is a list or
+tuple to override <a href="#id39"><span class="problematic" id="id40">:setting:`TEMPLATE_DIRS`</span></a>:<ul>
+<li><a class="reference internal" href="../ref/templates/api.html#django.template.loader.get_template" title="django.template.loader.get_template"><tt class="xref py py-func docutils literal"><span class="pre">django.template.loader.get_template()</span></tt></a></li>
+<li><a class="reference internal" href="../ref/templates/api.html#django.template.loader.select_template" title="django.template.loader.select_template"><tt class="xref py py-func docutils literal"><span class="pre">django.template.loader.select_template()</span></tt></a></li>
+<li><a class="reference internal" href="../topics/http/shortcuts.html#django.shortcuts.render" title="django.shortcuts.render"><tt class="xref py py-func docutils literal"><span class="pre">django.shortcuts.render()</span></tt></a></li>
+<li><a class="reference internal" href="../topics/http/shortcuts.html#django.shortcuts.render_to_response" title="django.shortcuts.render_to_response"><tt class="xref py py-func docutils literal"><span class="pre">django.shortcuts.render_to_response()</span></tt></a></li>
+</ul>
+</li>
+<li>The <a href="#id41"><span class="problematic" id="id42">:tfilter:`time`</span></a> filter now accepts timzone-related <a class="reference internal" href="../ref/templates/builtins.html#date-and-time-formatting-specifiers"><em>format
+specifiers</em></a> <tt class="docutils literal"><span class="pre">'e'</span></tt>, <tt class="docutils literal"><span class="pre">'O'</span></tt> , <tt class="docutils literal"><span class="pre">'T'</span></tt>
+and <tt class="docutils literal"><span class="pre">'Z'</span></tt> and is able to digest <a class="reference internal" href="../topics/i18n/timezones.html#naive-vs-aware-datetimes"><em>time-zone-aware</em></a> <tt class="docutils literal"><span class="pre">datetime</span></tt> instances performing the expected
+rendering.</li>
+<li>The <a href="#id43"><span class="problematic" id="id44">:ttag:`cache`</span></a> tag will now try to use the cache called
+&#8220;template_fragments&#8221; if it exists and fall back to using the default cache
+otherwise. It also now accepts an optional <tt class="docutils literal"><span class="pre">using</span></tt> keyword argument to
+control which cache it uses.</li>
+</ul>
+</div>
+<div class="section" id="requests">
+<h4>Requests<a class="headerlink" href="#requests" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>The new <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest.scheme" title="django.http.HttpRequest.scheme"><tt class="xref py py-attr docutils literal"><span class="pre">HttpRequest.scheme</span></tt></a> attribute
+specifies the scheme of the request (<tt class="docutils literal"><span class="pre">http</span></tt> or <tt class="docutils literal"><span class="pre">https</span></tt> normally).</li>
+</ul>
+</div>
+<div class="section" id="tests">
+<h4>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference internal" href="../topics/testing/advanced.html#django.test.runner.DiscoverRunner" title="django.test.runner.DiscoverRunner"><tt class="xref py py-class docutils literal"><span class="pre">DiscoverRunner</span></tt></a> has two new attributes,
+<a class="reference internal" href="../topics/testing/advanced.html#django.test.runner.DiscoverRunner.test_suite" title="django.test.runner.DiscoverRunner.test_suite"><tt class="xref py py-attr docutils literal"><span class="pre">test_suite</span></tt></a> and
+<a class="reference internal" href="../topics/testing/advanced.html#django.test.runner.DiscoverRunner.test_runner" title="django.test.runner.DiscoverRunner.test_runner"><tt class="xref py py-attr docutils literal"><span class="pre">test_runner</span></tt></a>, which facilitate
+overriding the way tests are collected and run.</li>
+<li>The <tt class="docutils literal"><span class="pre">fetch_redirect_response</span></tt> argument was added to
+<a class="reference internal" href="../topics/testing/overview.html#django.test.SimpleTestCase.assertRedirects" title="django.test.SimpleTestCase.assertRedirects"><tt class="xref py py-meth docutils literal"><span class="pre">assertRedirects()</span></tt></a>. Since the test
+client can&#8217;t fetch externals URLs, this allows you to use <tt class="docutils literal"><span class="pre">assertRedirects</span></tt>
+with redirects that aren&#8217;t part of your Django app.</li>
+<li>Correct handling of scheme when making comparisons in
+<a class="reference internal" href="../topics/testing/overview.html#django.test.SimpleTestCase.assertRedirects" title="django.test.SimpleTestCase.assertRedirects"><tt class="xref py py-meth docutils literal"><span class="pre">assertRedirects()</span></tt></a>.</li>
+<li>The <tt class="docutils literal"><span class="pre">secure</span></tt> argument was added to all the request methods of
+<a class="reference internal" href="../topics/testing/overview.html#django.test.Client" title="django.test.Client"><tt class="xref py py-class docutils literal"><span class="pre">Client</span></tt></a>. If <tt class="docutils literal"><span class="pre">True</span></tt>, the request will be made
+through HTTPS.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="backwards-incompatible-changes-in-1-7">
+<h2>Backwards incompatible changes in 1.7<a class="headerlink" href="#backwards-incompatible-changes-in-1-7" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">In addition to the changes outlined in this section, be sure to review the
+<a class="reference internal" href="../internals/deprecation.html"><em>deprecation plan</em></a> for any features that
+have been removed. If you haven&#8217;t updated your code within the
+deprecation timeline for a given feature, its removal may appear as a
+backwards incompatible change.</p>
+</div>
+<div class="section" id="allow-syncdb-allow-migrate">
+<h3>allow_syncdb/allow_migrate<a class="headerlink" href="#allow-syncdb-allow-migrate" title="Permalink to this headline">¶</a></h3>
+<p>While Django will still look at <tt class="docutils literal"><span class="pre">allow_syncdb</span></tt> methods even though they
+should be renamed to <tt class="docutils literal"><span class="pre">allow_migrate</span></tt>, there is a subtle difference in which
+models get passed to these methods.</p>
+<p>For apps with migrations, <tt class="docutils literal"><span class="pre">allow_migrate</span></tt> will now get passed
+<a class="reference internal" href="../topics/migrations.html#historical-models"><em>historical models</em></a>, which are special versioned models
+without custom attributes, methods or managers. Make sure your <tt class="docutils literal"><span class="pre">allow_migrate</span></tt>
+methods are only referring to fields or other items in <tt class="docutils literal"><span class="pre">model._meta</span></tt>.</p>
+</div>
+<div class="section" id="passing-none-to-manager-db-manager">
+<h3>Passing <tt class="docutils literal"><span class="pre">None</span></tt> to <tt class="docutils literal"><span class="pre">Manager.db_manager()</span></tt><a class="headerlink" href="#passing-none-to-manager-db-manager" title="Permalink to this headline">¶</a></h3>
+<p>In previous versions of Django, it was possible to use
+<tt class="docutils literal"><span class="pre">db_manager(using=None)</span></tt> on a model manager instance to obtain a manager
+instance using default routing behavior, overriding any manually specified
+database routing. In Django 1.7, a value of <tt class="docutils literal"><span class="pre">None</span></tt> passed to db_manager will
+produce a router that <em>retains</em> any manually assigned database routing &#8211; the
+manager will <em>not</em> be reset. This was necessary to resolve an inconsistency in
+the way routing information cascaded over joins. See <a class="reference external" href="https://code.djangoproject.com/ticket/13724">Ticket #13724</a> for more
+details.</p>
+</div>
+<div class="section" id="pytz-may-be-required">
+<h3>pytz may be required<a class="headerlink" href="#pytz-may-be-required" title="Permalink to this headline">¶</a></h3>
+<p>If your project handles datetimes before 1970 or after 2037 and Django raises
+a <a class="reference external" href="http://docs.python.org/library/exceptions.html#exceptions.ValueError" title="(in Python v2.7)"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> when encountering them, you will have to
+install <a class="reference external" href="https://pypi.python.org/pypi/pytz/">pytz</a>. You may be affected by this problem if you use Django&#8217;s time
+zone-related date formats or <a class="reference internal" href="../ref/contrib/syndication.html#module-django.contrib.syndication" title="django.contrib.syndication: A framework for generating syndication feeds, in RSS and Atom, quite easily."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.syndication</span></tt></a>.</p>
+</div>
+<div class="section" id="miscellaneous">
+<h3>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">The <a class="reference internal" href="../topics/http/file-uploads.html#django.core.files.uploadhandler.FileUploadHandler.new_file" title="django.core.files.uploadhandler.FileUploadHandler.new_file"><tt class="xref py py-meth docutils literal"><span class="pre">django.core.files.uploadhandler.FileUploadHandler.new_file()</span></tt></a>
+method is now passed an additional <tt class="docutils literal"><span class="pre">content_type_extra</span></tt> parameter. If you
+have a custom <a class="reference internal" href="../topics/http/file-uploads.html#django.core.files.uploadhandler.FileUploadHandler" title="django.core.files.uploadhandler.FileUploadHandler"><tt class="xref py py-class docutils literal"><span class="pre">FileUploadHandler</span></tt></a>
+that implements <tt class="docutils literal"><span class="pre">new_file()</span></tt>, be sure it accepts this new parameter.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../topics/forms/modelforms.html#django.forms.models.BaseModelFormSet" title="django.forms.models.BaseModelFormSet"><tt class="xref py py-class docutils literal"><span class="pre">ModelFormSet</span></tt></a>’s no longer
+delete instances when <tt class="docutils literal"><span class="pre">save(commit=False)</span></tt> is called. See
+<a class="reference internal" href="../topics/forms/formsets.html#django.forms.formsets.BaseFormSet.can_delete" title="django.forms.formsets.BaseFormSet.can_delete"><tt class="xref py py-attr docutils literal"><span class="pre">can_delete</span></tt></a> for instructions on how
+to manually delete objects from deleted forms.</p>
+</li>
+<li><p class="first">Loading empty fixtures emits a <tt class="docutils literal"><span class="pre">RuntimeWarning</span></tt> rather than raising
+<a class="reference internal" href="../howto/custom-management-commands.html#django.core.management.CommandError" title="django.core.management.CommandError"><tt class="xref py py-class docutils literal"><span class="pre">CommandError</span></tt></a>.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../ref/contrib/staticfiles.html#django.contrib.staticfiles.views.serve" title="django.contrib.staticfiles.views.serve"><tt class="xref py py-func docutils literal"><span class="pre">django.contrib.staticfiles.views.serve()</span></tt></a> will now raise an
+<a class="reference internal" href="../topics/http/views.html#django.http.Http404" title="django.http.Http404"><tt class="xref py py-exc docutils literal"><span class="pre">Http404</span></tt></a> exception instead of
+<a class="reference internal" href="../ref/exceptions.html#django.core.exceptions.ImproperlyConfigured" title="django.core.exceptions.ImproperlyConfigured"><tt class="xref py py-exc docutils literal"><span class="pre">ImproperlyConfigured</span></tt></a> when <a href="#id45"><span class="problematic" id="id46">:setting:`DEBUG`</span></a>
+is <tt class="docutils literal"><span class="pre">False</span></tt>. This change removes the need to conditionally add the view to
+your root URLconf, which in turn makes it safe to reverse by name. It also
+removes the ability for visitors to generate spurious HTTP 500 errors by
+requesting static files that don&#8217;t exist or haven&#8217;t been collected yet.</p>
+</li>
+<li><p class="first">The <a class="reference internal" href="../ref/models/instances.html#django.db.models.Model.__eq__" title="django.db.models.Model.__eq__"><tt class="xref py py-meth docutils literal"><span class="pre">django.db.models.Model.__eq__()</span></tt></a> method is now defined in a
+way where instances of a proxy model and its base model are considered
+equal when primary keys match. Previously only instances of exact same
+class were considered equal on primary key match.</p>
+</li>
+<li><p class="first">The <a class="reference internal" href="../ref/models/instances.html#django.db.models.Model.__eq__" title="django.db.models.Model.__eq__"><tt class="xref py py-meth docutils literal"><span class="pre">django.db.models.Model.__eq__()</span></tt></a> method has changed such that
+two <tt class="docutils literal"><span class="pre">Model</span></tt> instances without primary key values won&#8217;t be considered
+equal (unless they are the same instance).</p>
+</li>
+<li><p class="first">The <a class="reference internal" href="../ref/models/instances.html#django.db.models.Model.__hash__" title="django.db.models.Model.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">django.db.models.Model.__hash__()</span></tt></a> will now raise <tt class="docutils literal"><span class="pre">TypeError</span></tt>
+when called on an instance without a primary key value. This is done to
+avoid mutable <tt class="docutils literal"><span class="pre">__hash__</span></tt> values in containers.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../ref/models/fields.html#django.db.models.AutoField" title="django.db.models.AutoField"><tt class="xref py py-class docutils literal"><span class="pre">AutoField</span></tt></a> columns in SQLite databases will now be
+created using the <tt class="docutils literal"><span class="pre">AUTOINCREMENT</span></tt> option, which guarantees monotonic
+increments. This will cause primary key numbering behavior to change on
+SQLite, becoming consistent with most other SQL databases. This will only
+apply to newly created tables. If you have a database created with an older
+version of Django, you will need to migrate it to take advantage of this
+feature. For example, you could do the following:</p>
+<ol class="arabic simple">
+<li>Use <a href="#id47"><span class="problematic" id="id48">:djadmin:`dumpdata`</span></a> to save your data.</li>
+<li>Rename the existing database file (keep it as a backup).</li>
+<li>Run <a href="#id49"><span class="problematic" id="id50">:djadmin:`migrate`</span></a> to create the updated schema.</li>
+<li>Use <a href="#id51"><span class="problematic" id="id52">:djadmin:`loaddata`</span></a> to import the fixtures you exported in (1).</li>
+</ol>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">django.contrib.auth.models.AbstractUser</span></tt> no longer defines a
+<a class="reference internal" href="../ref/models/instances.html#django.db.models.Model.get_absolute_url" title="django.db.models.Model.get_absolute_url"><tt class="xref py py-meth docutils literal"><span class="pre">get_absolute_url()</span></tt></a> method. The old definition
+returned  <tt class="docutils literal"><span class="pre">&quot;/users/%s/&quot;</span> <span class="pre">%</span> <span class="pre">urlquote(self.username)</span></tt> which was arbitrary
+since applications may or may not define such a url in <tt class="docutils literal"><span class="pre">urlpatterns</span></tt>.
+Define a <tt class="docutils literal"><span class="pre">get_absolute_url()</span></tt> method on your own custom user object or use
+<a href="#id53"><span class="problematic" id="id54">:setting:`ABSOLUTE_URL_OVERRIDES`</span></a> if you want a URL for your user.</p>
+</li>
+<li><p class="first">The static asset-serving functionality of the
+<a class="reference internal" href="../topics/testing/overview.html#django.test.LiveServerTestCase" title="django.test.LiveServerTestCase"><tt class="xref py py-class docutils literal"><span class="pre">django.test.LiveServerTestCase</span></tt></a> class has been simplified: Now it&#8217;s
+only able to serve content already present in <a href="#id55"><span class="problematic" id="id56">:setting:`STATIC_ROOT`</span></a> when
+tests are run. The ability to transparently serve all the static assets
+(similarly to what one gets with <a href="#id57"><span class="problematic" id="id58">:setting:`DEBUG = True &lt;DEBUG&gt;`</span></a> at
+development-time) has been moved to a new class that lives in the
+<tt class="docutils literal"><span class="pre">staticfiles</span></tt> application (the one actually in charge of such feature):
+<a class="reference internal" href="../ref/contrib/staticfiles.html#django.contrib.staticfiles.testing.StaticLiveServerCase" title="django.contrib.staticfiles.testing.StaticLiveServerCase"><tt class="xref py py-class docutils literal"><span class="pre">django.contrib.staticfiles.testing.StaticLiveServerCase</span></tt></a>. In other
+words, <tt class="docutils literal"><span class="pre">LiveServerTestCase</span></tt> itself is less powerful but at the same time
+has less magic.</p>
+<p>Rationale behind this is removal of dependency of non-contrib code on
+contrib applications.</p>
+</li>
+<li><p class="first">The old cache URI syntax (e.g. <tt class="docutils literal"><span class="pre">&quot;locmem://&quot;</span></tt>) is no longer supported. It
+still worked, even though it was not documented or officially supported. If
+you&#8217;re still using it, please update to the current <a href="#id59"><span class="problematic" id="id60">:setting:`CACHES`</span></a> syntax.</p>
+</li>
+<li><p class="first">The default ordering of <tt class="docutils literal"><span class="pre">Form</span></tt> fields in case of inheritance has changed to
+follow normal Python MRO. Fields are now discovered by iterating through the
+MRO in reverse with the topmost class coming last. This only affects you if
+you relied on the default field ordering while having fields defined on both
+the current class <em>and</em> on a parent <tt class="docutils literal"><span class="pre">Form</span></tt>.</p>
+</li>
+<li><p class="first">The <tt class="docutils literal"><span class="pre">required</span></tt> argument of
+<a class="reference internal" href="../ref/forms/widgets.html#django.forms.extras.widgets.SelectDateWidget" title="django.forms.extras.widgets.SelectDateWidget"><tt class="xref py py-class docutils literal"><span class="pre">SelectDateWidget</span></tt></a> has been removed.
+This widget now respects the form field&#8217;s <tt class="docutils literal"><span class="pre">is_required</span></tt> attribute like
+other widgets.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../ref/models/querysets.html#django.db.models.query.QuerySet.select_related" title="django.db.models.query.QuerySet.select_related"><tt class="xref py py-meth docutils literal"><span class="pre">select_related()</span></tt></a> now chains in the
+same way as other similar calls like <tt class="docutils literal"><span class="pre">prefetch_related</span></tt>. That is,
+<tt class="docutils literal"><span class="pre">select_related('foo',</span> <span class="pre">'bar')</span></tt> is equivalent to
+<tt class="docutils literal"><span class="pre">select_related('foo').select_related('bar')</span></tt>. Previously the latter would
+have been equivalent to <tt class="docutils literal"><span class="pre">select_related('bar')</span></tt>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="features-deprecated-in-1-7">
+<h2>Features deprecated in 1.7<a class="headerlink" href="#features-deprecated-in-1-7" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="django-utils-dictconfig-django-utils-importlib">
+<h3><tt class="docutils literal"><span class="pre">django.utils.dictconfig</span></tt>/<tt class="docutils literal"><span class="pre">django.utils.importlib</span></tt><a class="headerlink" href="#django-utils-dictconfig-django-utils-importlib" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">django.utils.dictconfig</span></tt> and <tt class="docutils literal"><span class="pre">django.utils.importlib</span></tt> were copies of
+respectively <a class="reference external" href="http://docs.python.org/library/logging.config.html#module-logging.config" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">logging.config</span></tt></a> and <a class="reference external" href="http://docs.python.org/library/importlib.html#module-importlib" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">importlib</span></tt></a> provided for Python
+versions prior to 2.7. They have been deprecated.</p>
+</div>
+<div class="section" id="django-utils-tzinfo">
+<h3><tt class="docutils literal"><span class="pre">django.utils.tzinfo</span></tt><a class="headerlink" href="#django-utils-tzinfo" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">django.utils.tzinfo</span></tt> provided two <a class="reference external" href="http://docs.python.org/library/datetime.html#datetime.tzinfo" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">tzinfo</span></tt></a> subclasses,
+<tt class="docutils literal"><span class="pre">LocalTimezone</span></tt> and <tt class="docutils literal"><span class="pre">FixedOffset</span></tt>. They&#8217;ve been deprecated in favor of
+more correct alternatives provided by <a class="reference internal" href="../ref/utils.html#module-django.utils.timezone" title="django.utils.timezone: Timezone support."><tt class="xref py py-mod docutils literal"><span class="pre">django.utils.timezone</span></tt></a>,
+<a class="reference internal" href="../ref/utils.html#django.utils.timezone.get_default_timezone" title="django.utils.timezone.get_default_timezone"><tt class="xref py py-func docutils literal"><span class="pre">django.utils.timezone.get_default_timezone()</span></tt></a> and
+<a class="reference internal" href="../ref/utils.html#django.utils.timezone.get_fixed_timezone" title="django.utils.timezone.get_fixed_timezone"><tt class="xref py py-func docutils literal"><span class="pre">django.utils.timezone.get_fixed_timezone()</span></tt></a>.</p>
+</div>
+<div class="section" id="django-utils-unittest">
+<h3><tt class="docutils literal"><span class="pre">django.utils.unittest</span></tt><a class="headerlink" href="#django-utils-unittest" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">django.utils.unittest</span></tt> provided uniform access to the <tt class="docutils literal"><span class="pre">unittest2</span></tt> library
+on all Python versions. Since <tt class="docutils literal"><span class="pre">unittest2</span></tt> became the standard library&#8217;s
+<a class="reference external" href="http://docs.python.org/library/unittest.html#module-unittest" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">unittest</span></tt></a> module in Python 2.7, and Django 1.7 drops support for older
+Python versions, this module isn&#8217;t useful anymore. It has been deprecated. Use
+<a class="reference external" href="http://docs.python.org/library/unittest.html#module-unittest" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">unittest</span></tt></a> instead.</p>
+</div>
+<div class="section" id="django-utils-datastructures-sorteddict">
+<h3><tt class="docutils literal"><span class="pre">django.utils.datastructures.SortedDict</span></tt><a class="headerlink" href="#django-utils-datastructures-sorteddict" title="Permalink to this headline">¶</a></h3>
+<p>As <a class="reference external" href="http://docs.python.org/library/collections.html#collections.OrderedDict" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></tt></a> was added to the standard library in
+Python 2.7, <a class="reference internal" href="../ref/utils.html#django.utils.datastructures.SortedDict" title="django.utils.datastructures.SortedDict"><tt class="xref py py-class docutils literal"><span class="pre">SortedDict</span></tt></a> is no longer
+needed and has been deprecated.</p>
+</div>
+<div class="section" id="custom-sql-location-for-models-package">
+<h3>Custom SQL location for models package<a class="headerlink" href="#custom-sql-location-for-models-package" title="Permalink to this headline">¶</a></h3>
+<p>Previously, if models were organized in a package (<tt class="docutils literal"><span class="pre">myapp/models/</span></tt>) rather
+than simply <tt class="docutils literal"><span class="pre">myapp/models.py</span></tt>, Django would look for <a class="reference internal" href="../howto/initial-data.html#initial-sql"><em>initial SQL data</em></a> in <tt class="docutils literal"><span class="pre">myapp/models/sql/</span></tt>. This bug has been fixed so that Django
+will search <tt class="docutils literal"><span class="pre">myapp/sql/</span></tt> as documented. The old location will continue to
+work until Django 1.9.</p>
+</div>
+<div class="section" id="declared-fieldsets-attribute-on-modeladmin">
+<h3><tt class="docutils literal"><span class="pre">declared_fieldsets</span></tt> attribute on <tt class="docutils literal"><span class="pre">ModelAdmin</span></tt><a class="headerlink" href="#declared-fieldsets-attribute-on-modeladmin" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">ModelAdmin.declared_fieldsets</span></tt> has been deprecated. Despite being a private
+API, it will go through a regular deprecation path. This attribute was mostly
+used by methods that bypassed <tt class="docutils literal"><span class="pre">ModelAdmin.get_fieldsets()</span></tt> but this was
+considered a bug and has been addressed.</p>
+</div>
+<div class="section" id="syncdb">
+<h3><tt class="docutils literal"><span class="pre">syncdb</span></tt><a class="headerlink" href="#syncdb" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">syncdb</span></tt> command has been deprecated in favour of the new <tt class="docutils literal"><span class="pre">migrate</span></tt>
+command. <tt class="docutils literal"><span class="pre">migrate</span></tt> takes the same arguments as <tt class="docutils literal"><span class="pre">syncdb</span></tt> used to plus a few
+more, so it&#8217;s safe to just change the name you&#8217;re calling and nothing else.</p>
+</div>
+<div class="section" id="util-modules-renamed-to-utils">
+<h3><tt class="docutils literal"><span class="pre">util</span></tt> modules renamed to <tt class="docutils literal"><span class="pre">utils</span></tt><a class="headerlink" href="#util-modules-renamed-to-utils" title="Permalink to this headline">¶</a></h3>
+<p>The following instances of <tt class="docutils literal"><span class="pre">util.py</span></tt> in the Django codebase have been renamed
+to <tt class="docutils literal"><span class="pre">utils.py</span></tt> in an effort to unify all util and utils references:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">django.contrib.admin.util</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">django.contrib.gis.db.backends.util</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">django.db.backends.util</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">django.forms.util</span></tt></li>
+</ul>
+</div>
+<div class="section" id="get-formsets-method-on-modeladmin">
+<h3><tt class="docutils literal"><span class="pre">get_formsets</span></tt> method on <tt class="docutils literal"><span class="pre">ModelAdmin</span></tt><a class="headerlink" href="#get-formsets-method-on-modeladmin" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">ModelAdmin.get_formsets</span></tt> has been deprecated in favor of the new
+<a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.ModelAdmin.get_formsets_with_inlines" title="django.contrib.admin.ModelAdmin.get_formsets_with_inlines"><tt class="xref py py-meth docutils literal"><span class="pre">get_formsets_with_inlines()</span></tt></a>, in order to
+better handle the case of selecting showing inlines on a <tt class="docutils literal"><span class="pre">ModelAdmin</span></tt>.</p>
+</div>
+<div class="section" id="ipaddressfield">
+<h3><tt class="docutils literal"><span class="pre">IPAddressField</span></tt><a class="headerlink" href="#ipaddressfield" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../ref/models/fields.html#django.db.models.IPAddressField" title="django.db.models.IPAddressField"><tt class="xref py py-class docutils literal"><span class="pre">django.db.models.IPAddressField</span></tt></a> and
+<a class="reference internal" href="../ref/forms/fields.html#django.forms.IPAddressField" title="django.forms.IPAddressField"><tt class="xref py py-class docutils literal"><span class="pre">django.forms.IPAddressField</span></tt></a> fields have been deprecated in favor of
+<a class="reference internal" href="../ref/models/fields.html#django.db.models.GenericIPAddressField" title="django.db.models.GenericIPAddressField"><tt class="xref py py-class docutils literal"><span class="pre">django.db.models.GenericIPAddressField</span></tt></a> and
+<a class="reference internal" href="../ref/forms/fields.html#django.forms.GenericIPAddressField" title="django.forms.GenericIPAddressField"><tt class="xref py py-class docutils literal"><span class="pre">django.forms.GenericIPAddressField</span></tt></a>.</p>
+</div>
+<div class="section" id="basememcachedcache-get-memcache-timeout-method">
+<h3><tt class="docutils literal"><span class="pre">BaseMemcachedCache._get_memcache_timeout</span></tt> method<a class="headerlink" href="#basememcachedcache-get-memcache-timeout-method" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">BaseMemcachedCache._get_memcache_timeout()</span></tt> method has been renamed to
+<tt class="docutils literal"><span class="pre">get_backend_timeout()</span></tt>. Despite being a private API, it will go through the
+normal deprecation.</p>
+</div>
+<div class="section" id="natural-key-serialization-options">
+<h3>Natural key serialization options<a class="headerlink" href="#natural-key-serialization-options" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">--natural</span></tt> and <tt class="docutils literal"><span class="pre">-n</span></tt> options for <a href="#id61"><span class="problematic" id="id62">:djadmin:`dumpdata`</span></a> have been
+deprecated. Use <a href="#id63"><span class="problematic" id="id64">:djadminopt:`&#8211;natural-foreign`</span></a> instead.</p>
+<p>Similarly, the <tt class="docutils literal"><span class="pre">use_natural_keys</span></tt> argument for <tt class="docutils literal"><span class="pre">serializers.serialize()</span></tt>
+has been deprecated. Use <tt class="docutils literal"><span class="pre">use_natural_foreign_keys</span></tt> instead.</p>
+</div>
+<div class="section" id="merging-of-post-and-get-arguments-into-wsgirequest-request">
+<h3>Merging of <tt class="docutils literal"><span class="pre">POST</span></tt> and <tt class="docutils literal"><span class="pre">GET</span></tt> arguments into <tt class="docutils literal"><span class="pre">WSGIRequest.REQUEST</span></tt><a class="headerlink" href="#merging-of-post-and-get-arguments-into-wsgirequest-request" title="Permalink to this headline">¶</a></h3>
+<p>It was already strongly suggested that you use <tt class="docutils literal"><span class="pre">GET</span></tt> and <tt class="docutils literal"><span class="pre">POST</span></tt> instead of
+<tt class="docutils literal"><span class="pre">REQUEST</span></tt>, because the former are more explicit. The property <tt class="docutils literal"><span class="pre">REQUEST</span></tt> is
+deprecated and will be removed in Django 1.9.</p>
+</div>
+<div class="section" id="django-utils-datastructures-mergedict-class">
+<h3><tt class="docutils literal"><span class="pre">django.utils.datastructures.MergeDict</span></tt> class<a class="headerlink" href="#django-utils-datastructures-mergedict-class" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">MergeDict</span></tt> exists primarily to support merging <tt class="docutils literal"><span class="pre">POST</span></tt> and <tt class="docutils literal"><span class="pre">GET</span></tt>
+arguments into a <tt class="docutils literal"><span class="pre">REQUEST</span></tt> property on <tt class="docutils literal"><span class="pre">WSGIRequest</span></tt>. To merge
+dictionaries, use <tt class="docutils literal"><span class="pre">dict.update()</span></tt> instead. The class <tt class="docutils literal"><span class="pre">MergeDict</span></tt> is
+deprecated and will be removed in Django 1.9.</p>
+</div>
+<div class="section" id="language-codes-zh-cn-zh-tw-and-fy-nl">
+<h3>Language codes <tt class="docutils literal"><span class="pre">zh-cn</span></tt>, <tt class="docutils literal"><span class="pre">zh-tw</span></tt> and <tt class="docutils literal"><span class="pre">fy-nl</span></tt><a class="headerlink" href="#language-codes-zh-cn-zh-tw-and-fy-nl" title="Permalink to this headline">¶</a></h3>
+<p>The currently used language codes for Simplified Chinese <tt class="docutils literal"><span class="pre">zh-cn</span></tt>,
+Traditional Chinese <tt class="docutils literal"><span class="pre">zh-tw</span></tt> and (Western) Frysian <tt class="docutils literal"><span class="pre">fy-nl</span></tt> are deprecated
+and should be replaced by the language codes <tt class="docutils literal"><span class="pre">zh-hans</span></tt>, <tt class="docutils literal"><span class="pre">zh-hant</span></tt> and
+<tt class="docutils literal"><span class="pre">fy</span></tt> respectively. If you use these language codes, you should rename the
+locale directories and update your settings to reflect these changes. The
+deprecated language codes will be removed in Django 1.9.</p>
+</div>
+<div class="section" id="django-utils-functional-memoize-function">
+<h3><tt class="docutils literal"><span class="pre">django.utils.functional.memoize</span></tt> function<a class="headerlink" href="#django-utils-functional-memoize-function" title="Permalink to this headline">¶</a></h3>
+<p>The function <tt class="docutils literal"><span class="pre">memoize</span></tt> is deprecated and should be replaced by the
+<tt class="docutils literal"><span class="pre">functools.lru_cache</span></tt> decorator (available from Python 3.2 onwards).</p>
+<p>Django ships a backport of this decorator for older Python versions and it&#8217;s
+available at <tt class="docutils literal"><span class="pre">django.utils.lru_cache.lru_cache</span></tt>. The deprecated function will
+be removed in Django 1.9.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Django 1.7 release notes - UNDER DEVELOPMENT</a><ul>
+<li><a class="reference internal" href="#python-compatibility">Python compatibility</a></li>
+<li><a class="reference internal" href="#what-s-new-in-django-1-7">What&#8217;s new in Django 1.7</a><ul>
+<li><a class="reference internal" href="#schema-migrations">Schema migrations</a></li>
+<li><a class="reference internal" href="#new-method-on-field-subclasses">New method on Field subclasses</a></li>
+<li><a class="reference internal" href="#calling-custom-queryset-methods-from-the-manager">Calling custom <tt class="docutils literal"><span class="pre">QuerySet</span></tt> methods from the <tt class="docutils literal"><span class="pre">Manager</span></tt></a></li>
+<li><a class="reference internal" href="#using-a-custom-manager-when-traversing-reverse-relations">Using a custom manager when traversing reverse relations</a></li>
+<li><a class="reference internal" href="#new-prefetch-object-for-advanced-prefetch-related-operations">New <tt class="docutils literal"><span class="pre">Prefetch</span></tt> object for advanced <tt class="docutils literal"><span class="pre">prefetch_related</span></tt> operations.</a></li>
+<li><a class="reference internal" href="#admin-shortcuts-support-time-zones">Admin shortcuts support time zones</a></li>
+<li><a class="reference internal" href="#using-database-cursors-as-context-managers">Using database cursors as context managers</a></li>
+<li><a class="reference internal" href="#minor-features">Minor features</a><ul>
+<li><a class="reference internal" href="#django-contrib-admin"><tt class="docutils literal"><span class="pre">django.contrib.admin</span></tt></a></li>
+<li><a class="reference internal" href="#django-contrib-auth"><tt class="docutils literal"><span class="pre">django.contrib.auth</span></tt></a></li>
+<li><a class="reference internal" href="#django-contrib-gis"><tt class="docutils literal"><span class="pre">django.contrib.gis</span></tt></a></li>
+<li><a class="reference internal" href="#django-contrib-messages"><tt class="docutils literal"><span class="pre">django.contrib.messages</span></tt></a></li>
+<li><a class="reference internal" href="#django-contrib-redirects"><tt class="docutils literal"><span class="pre">django.contrib.redirects</span></tt></a></li>
+<li><a class="reference internal" href="#django-contrib-sessions"><tt class="docutils literal"><span class="pre">django.contrib.sessions</span></tt></a></li>
+<li><a class="reference internal" href="#django-contrib-sitemaps"><tt class="docutils literal"><span class="pre">django.contrib.sitemaps</span></tt></a></li>
+<li><a class="reference internal" href="#django-contrib-staticfiles"><tt class="docutils literal"><span class="pre">django.contrib.staticfiles</span></tt></a></li>
+<li><a class="reference internal" href="#django-contrib-syndication"><tt class="docutils literal"><span class="pre">django.contrib.syndication</span></tt></a></li>
+<li><a class="reference internal" href="#email">Email</a></li>
+<li><a class="reference internal" href="#file-uploads">File Uploads</a></li>
+<li><a class="reference internal" href="#forms">Forms</a></li>
+<li><a class="reference internal" href="#internationalization">Internationalization</a></li>
+<li><a class="reference internal" href="#management-commands">Management Commands</a></li>
+<li><a class="reference internal" href="#models">Models</a></li>
+<li><a class="reference internal" href="#signals">Signals</a></li>
+<li><a class="reference internal" href="#templates">Templates</a></li>
+<li><a class="reference internal" href="#requests">Requests</a></li>
+<li><a class="reference internal" href="#tests">Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#backwards-incompatible-changes-in-1-7">Backwards incompatible changes in 1.7</a><ul>
+<li><a class="reference internal" href="#allow-syncdb-allow-migrate">allow_syncdb/allow_migrate</a></li>
+<li><a class="reference internal" href="#passing-none-to-manager-db-manager">Passing <tt class="docutils literal"><span class="pre">None</span></tt> to <tt class="docutils literal"><span class="pre">Manager.db_manager()</span></tt></a></li>
+<li><a class="reference internal" href="#pytz-may-be-required">pytz may be required</a></li>
+<li><a class="reference internal" href="#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#features-deprecated-in-1-7">Features deprecated in 1.7</a><ul>
+<li><a class="reference internal" href="#django-utils-dictconfig-django-utils-importlib"><tt class="docutils literal"><span class="pre">django.utils.dictconfig</span></tt>/<tt class="docutils literal"><span class="pre">django.utils.importlib</span></tt></a></li>
+<li><a class="reference internal" href="#django-utils-tzinfo"><tt class="docutils literal"><span class="pre">django.utils.tzinfo</span></tt></a></li>
+<li><a class="reference internal" href="#django-utils-unittest"><tt class="docutils literal"><span class="pre">django.utils.unittest</span></tt></a></li>
+<li><a class="reference internal" href="#django-utils-datastructures-sorteddict"><tt class="docutils literal"><span class="pre">django.utils.datastructures.SortedDict</span></tt></a></li>
+<li><a class="reference internal" href="#custom-sql-location-for-models-package">Custom SQL location for models package</a></li>
+<li><a class="reference internal" href="#declared-fieldsets-attribute-on-modeladmin"><tt class="docutils literal"><span class="pre">declared_fieldsets</span></tt> attribute on <tt class="docutils literal"><span class="pre">ModelAdmin</span></tt></a></li>
+<li><a class="reference internal" href="#syncdb"><tt class="docutils literal"><span class="pre">syncdb</span></tt></a></li>
+<li><a class="reference internal" href="#util-modules-renamed-to-utils"><tt class="docutils literal"><span class="pre">util</span></tt> modules renamed to <tt class="docutils literal"><span class="pre">utils</span></tt></a></li>
+<li><a class="reference internal" href="#get-formsets-method-on-modeladmin"><tt class="docutils literal"><span class="pre">get_formsets</span></tt> method on <tt class="docutils literal"><span class="pre">ModelAdmin</span></tt></a></li>
+<li><a class="reference internal" href="#ipaddressfield"><tt class="docutils literal"><span class="pre">IPAddressField</span></tt></a></li>
+<li><a class="reference internal" href="#basememcachedcache-get-memcache-timeout-method"><tt class="docutils literal"><span class="pre">BaseMemcachedCache._get_memcache_timeout</span></tt> method</a></li>
+<li><a class="reference internal" href="#natural-key-serialization-options">Natural key serialization options</a></li>
+<li><a class="reference internal" href="#merging-of-post-and-get-arguments-into-wsgirequest-request">Merging of <tt class="docutils literal"><span class="pre">POST</span></tt> and <tt class="docutils literal"><span class="pre">GET</span></tt> arguments into <tt class="docutils literal"><span class="pre">WSGIRequest.REQUEST</span></tt></a></li>
+<li><a class="reference internal" href="#django-utils-datastructures-mergedict-class"><tt class="docutils literal"><span class="pre">django.utils.datastructures.MergeDict</span></tt> class</a></li>
+<li><a class="reference internal" href="#language-codes-zh-cn-zh-tw-and-fy-nl">Language codes <tt class="docutils literal"><span class="pre">zh-cn</span></tt>, <tt class="docutils literal"><span class="pre">zh-tw</span></tt> and <tt class="docutils literal"><span class="pre">fy-nl</span></tt></a></li>
+<li><a class="reference internal" href="#django-utils-functional-memoize-function"><tt class="docutils literal"><span class="pre">django.utils.functional.memoize</span></tt> function</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/releases/1.7.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

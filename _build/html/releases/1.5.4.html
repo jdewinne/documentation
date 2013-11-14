@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Django 1.5.4 release notes &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="django-1-5-4-release-notes">
+<h1>Django 1.5.4 release notes<a class="headerlink" href="#django-1-5-4-release-notes" title="Permalink to this headline">¶</a></h1>
+<p><em>September 14, 2013</em></p>
+<p>This is Django 1.5.4, the fourth release in the Django 1.5 series. It addresses
+two security issues and one bug.</p>
+<div class="section" id="denial-of-service-via-password-hashers">
+<h2>Denial-of-service via password hashers<a class="headerlink" href="#denial-of-service-via-password-hashers" title="Permalink to this headline">¶</a></h2>
+<p>In previous versions of Django, no limit was imposed on the plaintext
+length of a password. This allowed a denial-of-service attack through
+submission of bogus but extremely large passwords, tying up server
+resources performing the (expensive, and increasingly expensive with
+the length of the password) calculation of the corresponding hash.</p>
+<p>As of 1.5.4, Django&#8217;s authentication framework imposes a 4096-byte
+limit on passwords, and will fail authentication with any submitted
+password of greater length.</p>
+</div>
+<div class="section" id="corrected-usage-of-sensitive-post-parameters-in-django-contrib-auths-admin">
+<h2>Corrected usage of <a class="reference internal" href="../howto/error-reporting.html#django.views.decorators.debug.sensitive_post_parameters" title="django.views.decorators.debug.sensitive_post_parameters"><tt class="xref py py-func docutils literal"><span class="pre">sensitive_post_parameters()</span></tt></a> in <a class="reference internal" href="../topics/auth/index.html#module-django.contrib.auth" title="django.contrib.auth: Django's authentication framework."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.auth</span></tt></a>’s admin<a class="headerlink" href="#corrected-usage-of-sensitive-post-parameters-in-django-contrib-auths-admin" title="Permalink to this headline">¶</a></h2>
+<p>The decoration of the <tt class="docutils literal"><span class="pre">add_view</span></tt> and <tt class="docutils literal"><span class="pre">user_change_password</span></tt> user admin
+views with <a class="reference internal" href="../howto/error-reporting.html#django.views.decorators.debug.sensitive_post_parameters" title="django.views.decorators.debug.sensitive_post_parameters"><tt class="xref py py-func docutils literal"><span class="pre">sensitive_post_parameters()</span></tt></a>
+did not include <a class="reference internal" href="../ref/utils.html#django.utils.decorators.method_decorator" title="django.utils.decorators.method_decorator"><tt class="xref py py-func docutils literal"><span class="pre">method_decorator()</span></tt></a> (required
+since the views are methods) resulting in the decorator not being properly
+applied. This usage has been fixed and
+<a class="reference internal" href="../howto/error-reporting.html#django.views.decorators.debug.sensitive_post_parameters" title="django.views.decorators.debug.sensitive_post_parameters"><tt class="xref py py-func docutils literal"><span class="pre">sensitive_post_parameters()</span></tt></a> will now
+throw an exception if it&#8217;s improperly used.</p>
+<div class="section" id="bugfixes">
+<h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Fixed a bug that prevented a <tt class="docutils literal"><span class="pre">QuerySet</span></tt> that uses
+<a class="reference internal" href="../ref/models/querysets.html#django.db.models.query.QuerySet.prefetch_related" title="django.db.models.query.QuerySet.prefetch_related"><tt class="xref py py-meth docutils literal"><span class="pre">prefetch_related()</span></tt></a> from being pickled
+and unpickled more than once (the second pickling attempt raised an
+exception) (#21102).</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Django 1.5.4 release notes</a><ul>
+<li><a class="reference internal" href="#denial-of-service-via-password-hashers">Denial-of-service via password hashers</a></li>
+<li><a class="reference internal" href="#corrected-usage-of-sensitive-post-parameters-in-django-contrib-auths-admin">Corrected usage of <tt class="docutils literal"><span class="pre">sensitive_post_parameters()</span></tt> in <tt class="docutils literal"><span class="pre">django.contrib.auth</span></tt>’s admin</a><ul>
+<li><a class="reference internal" href="#bugfixes">Bugfixes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/releases/1.5.4.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

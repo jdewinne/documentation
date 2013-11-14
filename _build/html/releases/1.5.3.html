@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Django 1.5.3 release notes &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="django-1-5-3-release-notes">
+<h1>Django 1.5.3 release notes<a class="headerlink" href="#django-1-5-3-release-notes" title="Permalink to this headline">¶</a></h1>
+<p><em>September 10, 2013</em></p>
+<p>This is Django 1.5.3, the third release in the Django 1.5 series. It addresses
+one security issue and also contains an opt-in feature to enhance the security
+of <a class="reference internal" href="../topics/http/sessions.html#module-django.contrib.sessions" title="django.contrib.sessions: Provides session management for Django projects."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.sessions</span></tt></a>.</p>
+<div class="section" id="directory-traversal-vulnerability-in-ttag-ssi-template-tag">
+<h2>Directory traversal vulnerability in <a href="#id1"><span class="problematic" id="id2">:ttag:`ssi`</span></a> template tag<a class="headerlink" href="#directory-traversal-vulnerability-in-ttag-ssi-template-tag" title="Permalink to this headline">¶</a></h2>
+<p>In previous versions of Django it was possible to bypass the
+<a href="#id3"><span class="problematic" id="id4">:setting:`ALLOWED_INCLUDE_ROOTS`</span></a> setting used for security with the <a href="#id5"><span class="problematic" id="id6">:ttag:`ssi`</span></a>
+template tag by specifying a relative path that starts with one of the allowed
+roots. For example, if <tt class="docutils literal"><span class="pre">ALLOWED_INCLUDE_ROOTS</span> <span class="pre">=</span> <span class="pre">(&quot;/var/www&quot;,)</span></tt> the following
+would be possible:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">ssi</span> <span class="s2">&quot;/var/www/../../etc/passwd&quot;</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>In practice this is not a very common problem, as it would require the template
+author to put the <a href="#id7"><span class="problematic" id="id8">:ttag:`ssi`</span></a> file in a user-controlled variable, but it&#8217;s
+possible in principle.</p>
+</div>
+<div class="section" id="mitigating-a-remote-code-execution-vulnerability-in-django-contrib-sessions">
+<h2>Mitigating a remote-code execution vulnerability in <a class="reference internal" href="../topics/http/sessions.html#module-django.contrib.sessions" title="django.contrib.sessions: Provides session management for Django projects."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.sessions</span></tt></a><a class="headerlink" href="#mitigating-a-remote-code-execution-vulnerability-in-django-contrib-sessions" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../topics/http/sessions.html#module-django.contrib.sessions" title="django.contrib.sessions: Provides session management for Django projects."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.sessions</span></tt></a> currently uses <a class="reference external" href="http://docs.python.org/library/pickle.html#module-pickle" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">pickle</span></tt></a> to serialize
+session data before storing it in the backend. If you&#8217;re using the <a class="reference internal" href="../topics/http/sessions.html#cookie-session-backend"><em>signed
+cookie session backend</em></a> and <a href="#id9"><span class="problematic" id="id10">:setting:`SECRET_KEY`</span></a> is
+known by an attacker (there isn&#8217;t an inherent vulnerability in Django that
+would cause it to leak), the attacker could insert a string into his session
+which, when unpickled, executes arbitrary code on the server. The technique for
+doing so is simple and easily available on the internet. Although the cookie
+session storage signs the cookie-stored data to prevent tampering, a
+<a href="#id11"><span class="problematic" id="id12">:setting:`SECRET_KEY`</span></a> leak immediately escalates to a remote code execution
+vulnerability.</p>
+<p>This attack can be mitigated by serializing session data using JSON rather
+than <a class="reference external" href="http://docs.python.org/library/pickle.html#module-pickle" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">pickle</span></tt></a>. To facilitate this, Django 1.5.3 introduces a new setting,
+<a href="#id13"><span class="problematic" id="id14">:setting:`SESSION_SERIALIZER`</span></a>, to customize the session serialization format.
+For backwards compatibility, this setting defaults to using <a class="reference external" href="http://docs.python.org/library/pickle.html#module-pickle" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">pickle</span></tt></a>.
+While JSON serialization does not support all Python objects like <a class="reference external" href="http://docs.python.org/library/pickle.html#module-pickle" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">pickle</span></tt></a>
+does, we highly recommend switching to JSON-serialized values. Also,
+as JSON requires string keys, you will likely run into problems if you are
+using non-string keys in <tt class="docutils literal"><span class="pre">request.session</span></tt>. See the
+<a class="reference internal" href="../topics/http/sessions.html#session-serialization"><em>Session serialization</em></a> documentation for more details.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Django 1.5.3 release notes</a><ul>
+<li><a class="reference internal" href="#directory-traversal-vulnerability-in-ttag-ssi-template-tag">Directory traversal vulnerability in :ttag:`ssi` template tag</a></li>
+<li><a class="reference internal" href="#mitigating-a-remote-code-execution-vulnerability-in-django-contrib-sessions">Mitigating a remote-code execution vulnerability in <tt class="docutils literal"><span class="pre">django.contrib.sessions</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/releases/1.5.3.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

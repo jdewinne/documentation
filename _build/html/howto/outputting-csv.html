@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Outputting CSV with Django &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="outputting-csv-with-django">
+<h1>Outputting CSV with Django<a class="headerlink" href="#outputting-csv-with-django" title="Permalink to this headline">¶</a></h1>
+<p>This document explains how to output CSV (Comma Separated Values) dynamically
+using Django views. To do this, you can either use the Python CSV library or the
+Django template system.</p>
+<div class="section" id="using-the-python-csv-library">
+<h2>Using the Python CSV library<a class="headerlink" href="#using-the-python-csv-library" title="Permalink to this headline">¶</a></h2>
+<p>Python comes with a CSV library, <a class="reference external" href="http://docs.python.org/library/csv.html#module-csv" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">csv</span></tt></a>. The key to using it with Django is
+that the <a class="reference external" href="http://docs.python.org/library/csv.html#module-csv" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">csv</span></tt></a> module&#8217;s CSV-creation capability acts on file-like objects,
+and Django&#8217;s <a class="reference internal" href="../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> objects are file-like objects.</p>
+<p>Here&#8217;s an example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
+
+<span class="k">def</span> <span class="nf">some_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c"># Create the HttpResponse object with the appropriate CSV header.</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s">&#39;text/csv&#39;</span><span class="p">)</span>
+    <span class="n">response</span><span class="p">[</span><span class="s">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;attachment; filename=&quot;somefilename.csv&quot;&#39;</span>
+
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s">&#39;First row&#39;</span><span class="p">,</span> <span class="s">&#39;Foo&#39;</span><span class="p">,</span> <span class="s">&#39;Bar&#39;</span><span class="p">,</span> <span class="s">&#39;Baz&#39;</span><span class="p">])</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s">&#39;Second row&#39;</span><span class="p">,</span> <span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;&quot;Testing&quot;&#39;</span><span class="p">,</span> <span class="s">&quot;Here&#39;s a quote&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+</div>
+<p>The code and comments should be self-explanatory, but a few things deserve a
+mention:</p>
+<ul class="simple">
+<li>The response gets a special MIME type, <em class="mimetype">text/csv</em>. This tells
+browsers that the document is a CSV file, rather than an HTML file. If
+you leave this off, browsers will probably interpret the output as HTML,
+which will result in ugly, scary gobbledygook in the browser window.</li>
+<li>The response gets an additional <tt class="docutils literal"><span class="pre">Content-Disposition</span></tt> header, which
+contains the name of the CSV file. This filename is arbitrary; call it
+whatever you want. It&#8217;ll be used by browsers in the &#8220;Save as...&#8221;
+dialogue, etc.</li>
+<li>Hooking into the CSV-generation API is easy: Just pass <tt class="docutils literal"><span class="pre">response</span></tt> as the
+first argument to <tt class="docutils literal"><span class="pre">csv.writer</span></tt>. The <tt class="docutils literal"><span class="pre">csv.writer</span></tt> function expects a
+file-like object, and <a class="reference internal" href="../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> objects fit the
+bill.</li>
+<li>For each row in your CSV file, call <tt class="docutils literal"><span class="pre">writer.writerow</span></tt>, passing it an
+iterable object such as a list or tuple.</li>
+<li>The CSV module takes care of quoting for you, so you don&#8217;t have to worry
+about escaping strings with quotes or commas in them. Just pass
+<tt class="docutils literal"><span class="pre">writerow()</span></tt> your raw strings, and it&#8217;ll do the right thing.</li>
+</ul>
+<div class="section" id="handling-unicode">
+<h3>Handling Unicode<a class="headerlink" href="#handling-unicode" title="Permalink to this headline">¶</a></h3>
+<p>Python&#8217;s <a class="reference external" href="http://docs.python.org/library/csv.html#module-csv" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">csv</span></tt></a> module does not support Unicode input. Since Django uses
+Unicode internally this means strings read from sources such as
+<a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt></a> are potentially problematic. There are a few
+options for handling this:</p>
+<ul class="simple">
+<li>Manually encode all Unicode objects to a compatible encoding.</li>
+<li>Use the <tt class="docutils literal"><span class="pre">UnicodeWriter</span></tt> class provided in the <a class="reference external" href="http://docs.python.org/library/csv.html#examples">csv module&#8217;s examples
+section</a>.</li>
+<li>Use the <a class="reference external" href="https://github.com/jdunck/python-unicodecsv">python-unicodecsv module</a>, which aims to be a drop-in
+replacement for <a class="reference external" href="http://docs.python.org/library/csv.html#module-csv" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">csv</span></tt></a> that gracefully handles Unicode.</li>
+</ul>
+<p>For more information, see the Python documentation of the <a class="reference external" href="http://docs.python.org/library/csv.html#module-csv" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">csv</span></tt></a> module.</p>
+</div>
+</div>
+<div class="section" id="using-the-template-system">
+<h2>Using the template system<a class="headerlink" href="#using-the-template-system" title="Permalink to this headline">¶</a></h2>
+<p>Alternatively, you can use the <a class="reference internal" href="../topics/templates.html"><em>Django template system</em></a>
+to generate CSV. This is lower-level than using the convenient Python <a class="reference external" href="http://docs.python.org/library/csv.html#module-csv" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">csv</span></tt></a>
+module, but the solution is presented here for completeness.</p>
+<p>The idea here is to pass a list of items to your template, and have the
+template output the commas in a <a href="#id1"><span class="problematic" id="id2">:ttag:`for`</span></a> loop.</p>
+<p>Here&#8217;s an example, which generates the same CSV file as above:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span> <span class="nn">django.template</span> <span class="kn">import</span> <span class="n">loader</span><span class="p">,</span> <span class="n">Context</span>
+
+<span class="k">def</span> <span class="nf">some_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c"># Create the HttpResponse object with the appropriate CSV header.</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s">&#39;text/csv&#39;</span><span class="p">)</span>
+    <span class="n">response</span><span class="p">[</span><span class="s">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;attachment; filename=&quot;somefilename.csv&quot;&#39;</span>
+
+    <span class="c"># The data is hard-coded here, but you could load it from a database or</span>
+    <span class="c"># some other source.</span>
+    <span class="n">csv_data</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="s">&#39;First row&#39;</span><span class="p">,</span> <span class="s">&#39;Foo&#39;</span><span class="p">,</span> <span class="s">&#39;Bar&#39;</span><span class="p">,</span> <span class="s">&#39;Baz&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;Second row&#39;</span><span class="p">,</span> <span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;&quot;Testing&quot;&#39;</span><span class="p">,</span> <span class="s">&quot;Here&#39;s a quote&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">t</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s">&#39;my_template_name.txt&#39;</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Context</span><span class="p">({</span>
+        <span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="n">csv_data</span><span class="p">,</span>
+    <span class="p">})</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+</div>
+<p>The only difference between this example and the previous example is that this
+one uses template loading instead of the CSV module. The rest of the code &#8211;
+such as the <tt class="docutils literal"><span class="pre">content_type='text/csv'</span></tt> &#8211; is the same.</p>
+<p>Then, create the template <tt class="docutils literal"><span class="pre">my_template_name.txt</span></tt>, with this template code:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">for</span> <span class="nv">row</span> <span class="k">in</span> <span class="nv">data</span> <span class="cp">%}</span>&quot;<span class="cp">{{</span> <span class="nv">row.0</span><span class="o">|</span><span class="nf">addslashes</span> <span class="cp">}}</span>&quot;, &quot;<span class="cp">{{</span> <span class="nv">row.1</span><span class="o">|</span><span class="nf">addslashes</span> <span class="cp">}}</span>&quot;, &quot;<span class="cp">{{</span> <span class="nv">row.2</span><span class="o">|</span><span class="nf">addslashes</span> <span class="cp">}}</span>&quot;, &quot;<span class="cp">{{</span> <span class="nv">row.3</span><span class="o">|</span><span class="nf">addslashes</span> <span class="cp">}}</span>&quot;, &quot;<span class="cp">{{</span> <span class="nv">row.4</span><span class="o">|</span><span class="nf">addslashes</span> <span class="cp">}}</span>&quot;
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>This template is quite basic. It just iterates over the given data and displays
+a line of CSV for each row. It uses the <a href="#id3"><span class="problematic" id="id4">:tfilter:`addslashes`</span></a> template filter to
+ensure there aren&#8217;t any problems with quotes.</p>
+</div>
+<div class="section" id="other-text-based-formats">
+<h2>Other text-based formats<a class="headerlink" href="#other-text-based-formats" title="Permalink to this headline">¶</a></h2>
+<p>Notice that there isn&#8217;t very much specific to CSV here &#8211; just the specific
+output format. You can use either of these techniques to output any text-based
+format you can dream of. You can also use a similar technique to generate
+arbitrary binary data; see <a class="reference internal" href="outputting-pdf.html"><em>Outputting PDFs with Django</em></a> for an example.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Outputting CSV with Django</a><ul>
+<li><a class="reference internal" href="#using-the-python-csv-library">Using the Python CSV library</a><ul>
+<li><a class="reference internal" href="#handling-unicode">Handling Unicode</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-the-template-system">Using the template system</a></li>
+<li><a class="reference internal" href="#other-text-based-formats">Other text-based formats</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/howto/outputting-csv.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

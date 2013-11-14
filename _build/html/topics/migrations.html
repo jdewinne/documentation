@@ -1,0 +1,368 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Migrations &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-django.db.migrations">
+<span id="migrations"></span><h1>Migrations<a class="headerlink" href="#module-django.db.migrations" title="Permalink to this headline">¶</a></h1>
+<div class="versionadded">
+<p><span>New in version 1.7.</span></p>
+</div>
+<p>Migrations are Django&#8217;s way of propagating changes you make to your models
+(adding a field, deleting a model, etc.) into your database schema. They&#8217;re
+designed to be mostly automatic, but you&#8217;ll need to know when to make
+migrations, when to run them, and the common problems you might run into.</p>
+<div class="section" id="a-brief-history">
+<h2>A Brief History<a class="headerlink" href="#a-brief-history" title="Permalink to this headline">¶</a></h2>
+<p>Prior to version 1.7, Django only supported adding new models to the
+database; it was not possible to alter or remove existing models via the
+<tt class="docutils literal"><span class="pre">syncdb</span></tt> command (the predecessor to <tt class="docutils literal"><span class="pre">migrate</span></tt>).</p>
+<p>Third-party tools, most notably <a class="reference external" href="http://south.aeracode.org">South</a>,
+provided support for these additional types of change, but it was considered
+important enough that support was brought into core Django.</p>
+</div>
+<div class="section" id="two-commands">
+<h2>Two Commands<a class="headerlink" href="#two-commands" title="Permalink to this headline">¶</a></h2>
+<p>There are two commands which you will use to interact with migrations
+and Django&#8217;s handling of database schema:</p>
+<ul class="simple">
+<li><a href="#id1"><span class="problematic" id="id2">:djadmin:`migrate`</span></a>, which is responsible for applying migrations, as well as
+unapplying and listing their status.</li>
+<li><a href="#id3"><span class="problematic" id="id4">:djadmin:`makemigrations`</span></a>, which is responsible for creating new migrations
+based on the changes you have made to your models.</li>
+</ul>
+<p>It&#8217;s worth noting that migrations are created and run on a per-app basis.
+In particular, it&#8217;s possible to have apps that <em>do not use migrations</em> (these
+are referred to as &#8220;unmigrated&#8221; apps) - these apps will instead mimic the
+legacy behaviour of just adding new models.</p>
+<p>You should think of migrations as a version control system for your database
+schema. <tt class="docutils literal"><span class="pre">makemigrations</span></tt> is responsible for packaging up your model changes
+into individual migration files - analagous to commits - and <tt class="docutils literal"><span class="pre">migrate</span></tt> is
+responsible for applying those to your database.</p>
+<p>The migration files for each app live in a &#8220;migrations&#8221; directory inside
+of that app, and are designed to be committed to, and distributed as part
+of, its codebase. You should be making them once on your development machine
+and then running the same migrations on your colleagues&#8217; machines, your
+staging machines, and eventually your production machines.</p>
+<p>Migrations will run the same way every time and produce consistent results,
+meaning that what you see in development and staging is exactly what will
+happen in production - no unexpected surprises.</p>
+</div>
+<div class="section" id="backend-support">
+<h2>Backend Support<a class="headerlink" href="#backend-support" title="Permalink to this headline">¶</a></h2>
+<p>Migrations are supported on all backends that Django ships with, as well
+as any third-party backends if they have programmed in support for schema
+alteration (done via the <tt class="docutils literal"><span class="pre">SchemaEditor</span></tt> class).</p>
+<p>However, some databases are more capable than others when it comes to
+schema migrations; some of the caveats are covered below.</p>
+<div class="section" id="postgresql">
+<h3>PostgreSQL<a class="headerlink" href="#postgresql" title="Permalink to this headline">¶</a></h3>
+<p>PostgreSQL is the most capable of all the databases here in terms of schema
+support; the only caveat is that adding columns with default values will
+lock a table for a time proportional to the number of rows in it.</p>
+<p>For this reason, it&#8217;s recommended you always create new columns with
+<tt class="docutils literal"><span class="pre">null=True</span></tt>, as this way they will be added immediately.</p>
+</div>
+<div class="section" id="mysql">
+<h3>MySQL<a class="headerlink" href="#mysql" title="Permalink to this headline">¶</a></h3>
+<p>MySQL lacks support for transactions around schema alteration operations,
+meaning that if a migration fails to apply you will have to manually unpick
+the changes in order to try again (it&#8217;s impossible to roll back to an
+earlier point).</p>
+<p>In addition, MySQL will lock tables for almost every schema operation and
+generally takes a time proportional to the number of rows in the table to
+add or remove columns. On slower hardware this can be worse than a minute
+per million rows - adding a few columns to a table with just a few million
+rows could lock your site up for over ten minutes.</p>
+<p>Finally, MySQL has reasonably small limits on name lengths for columns, tables
+and indexes, as well as a limit on the combined size of all columns an index
+covers. This means that indexes that are possible on other backends will
+fail to be created under MySQL.</p>
+</div>
+<div class="section" id="sqlite">
+<h3>SQLite<a class="headerlink" href="#sqlite" title="Permalink to this headline">¶</a></h3>
+<p>SQLite has very little built-in schema alteration support, and so Django
+attempts to emulate it by:</p>
+<ul class="simple">
+<li>Creating a new table with the new schema</li>
+<li>Copying the data across</li>
+<li>Dropping the old table</li>
+<li>Renaming the new table to match the original name</li>
+</ul>
+<p>This process generally works well, but it can be slow and occasionally
+buggy. It is not recommended that you run and migrate SQLite in a
+production environment unless you are very aware of the risks and
+its limitations; the support Django ships with is designed to allow
+developers to use SQLite on their local machines to develop less complex
+Django projects without the need for a full database.</p>
+</div>
+</div>
+<div class="section" id="workflow">
+<h2>Workflow<a class="headerlink" href="#workflow" title="Permalink to this headline">¶</a></h2>
+<p>Working with migrations is simple. Make changes to your models - say, add
+a field and remove a model - and then run <a href="#id5"><span class="problematic" id="id6">:djadmin:`makemigrations`</span></a>:</p>
+<div class="highlight-python"><pre>$ python manage.py makemigrations
+Migrations for 'books':
+  0003_auto.py:
+    - Alter field author on book</pre>
+</div>
+<p>Your models will be scanned and compared to the versions currently
+contained in your migration files, and then a new set of migrations
+will be written out. Make sure to read the output to see what
+<tt class="docutils literal"><span class="pre">makemigrations</span></tt> thinks you have changed - it&#8217;s not perfect, and for
+complex changes it might not be detecting what you expect.</p>
+<p>Once you have your new migration files, you should apply them to your
+database to make sure they work as expected:</p>
+<div class="highlight-python"><pre>$ python manage.py migrate
+Operations to perform:
+  Synchronize unmigrated apps: sessions, admin, messages, auth, staticfiles, contenttypes
+  Apply all migrations: books
+Synchronizing apps without migrations:
+  Creating tables...
+  Installing custom SQL...
+  Installing indexes...
+Installed 0 object(s) from 0 fixture(s)
+Running migrations:
+  Applying books.0003_auto... OK</pre>
+</div>
+<p>The command runs in two stages; first, it synchronizes unmigrated apps
+(performing the same functionality that <tt class="docutils literal"><span class="pre">syncdb</span></tt> used to provide), and
+then it runs any migrations that have not yet been applied.</p>
+<p>Once the migration is applied, commit the migration and the models change
+to your version control system as a single commit - that way, when other
+developers (or your production servers) check out the code, they&#8217;ll
+get both the changes to your models and the accompanying migration at the
+same time.</p>
+<div class="section" id="version-control">
+<h3>Version control<a class="headerlink" href="#version-control" title="Permalink to this headline">¶</a></h3>
+<p>Because migrations are stored in version control, you&#8217;ll occasionally
+come across situations where you and another developer have both committed
+a migration to the same app at the same time, resulting in two migrations
+with the same number.</p>
+<p>Don&#8217;t worry - the numbers are just there for developers&#8217; reference, Django
+just cares that each migration has a different name. Migrations specify which
+other migrations they depend on - including earlier migrations in the same
+app - in the file, so it&#8217;s possible to detect when there&#8217;s two new migrations
+for the same app that aren&#8217;t ordered.</p>
+<p>When this happens, Django will prompt you and give you some options. If it
+thinks it&#8217;s safe enough, it will offer to automatically linearize the two
+migrations for you. If not, you&#8217;ll have to go in and modify the migrations
+yourself - don&#8217;t worry, this isn&#8217;t difficult, and is explained more in
+<a class="reference internal" href="#migration-files"><em>Migration files</em></a> below.</p>
+</div>
+</div>
+<div class="section" id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>While migrations are per-app, the tables and relationships implied by
+your models are too complex to be created for just one app at a time. When
+you make a migration that requires something else to run - for example,
+you add a ForeignKey in your <tt class="docutils literal"><span class="pre">books</span></tt> app to your <tt class="docutils literal"><span class="pre">authors</span></tt> app - the
+resulting migration will contain a dependency on a migration in <tt class="docutils literal"><span class="pre">authors</span></tt>.</p>
+<p>This means that when you run the migrations, the <tt class="docutils literal"><span class="pre">authors</span></tt> migration runs
+first and creates the table the <tt class="docutils literal"><span class="pre">ForeignKey</span></tt> references, and then the migration
+that makes the <tt class="docutils literal"><span class="pre">ForeignKey</span></tt> column runs afterwards and creates the constraint.
+If this didn&#8217;t happen, the migration would try to create the ForeignKey column
+without the table it&#8217;s referencing existing and your database would
+throw an error.</p>
+<p>This dependency behaviour affects most migration operations where you
+restrict to a single app. Restricting to a single app (either in
+<tt class="docutils literal"><span class="pre">makemigrations</span></tt> or <tt class="docutils literal"><span class="pre">migrate</span></tt>) is a best-efforts promise, and not
+a guarantee; any other apps that need to be used to get dependencies correct
+will be.</p>
+</div>
+<div class="section" id="migration-files">
+<span id="id7"></span><h2>Migration files<a class="headerlink" href="#migration-files" title="Permalink to this headline">¶</a></h2>
+<p>Migrations are stored as an on-disk format, referred to here as
+&#8220;migration files&#8221;. These files are actually just normal Python files with
+an agreed-upon object layout, written in a declarative style.</p>
+<p>A basic migration file looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">migrations</span><span class="p">,</span> <span class="n">models</span>
+
+<span class="k">class</span> <span class="nc">Migration</span><span class="p">(</span><span class="n">migrations</span><span class="o">.</span><span class="n">Migration</span><span class="p">):</span>
+
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;migrations&quot;</span><span class="p">,</span> <span class="s">&quot;0001_initial&quot;</span><span class="p">)]</span>
+
+    <span class="n">operations</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">migrations</span><span class="o">.</span><span class="n">DeleteModel</span><span class="p">(</span><span class="s">&quot;Tribble&quot;</span><span class="p">),</span>
+        <span class="n">migrations</span><span class="o">.</span><span class="n">AddField</span><span class="p">(</span><span class="s">&quot;Author&quot;</span><span class="p">,</span> <span class="s">&quot;rating&quot;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)),</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+<p>What Django looks for when it loads a migration file (as a Python module) is
+a subclass of <tt class="docutils literal"><span class="pre">django.db.migrations.Migration</span></tt> called <tt class="docutils literal"><span class="pre">Migration</span></tt>. It then
+inspects this object for four attributes, only two of which are used
+most of the time:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">dependencies</span></tt>, a list of migrations this one depends on.</li>
+<li><tt class="docutils literal"><span class="pre">operations</span></tt>, a list of Operation classes that define what this migration
+does.</li>
+</ul>
+<p>The operations are the key; they are a set of declarative instructions which
+tell Django what schema changes need to be made. Django scans them and
+builds an in-memory representation of all of the schema changes to all apps,
+and uses this to generate the SQL which makes the schema changes.</p>
+<p>That in-memory structure is also used to work out what the differences are
+between your models and the current state of your migrations; Django runs
+through all the changes, in order, on an in-memory set of models to come
+up with the state of your models last time you ran <tt class="docutils literal"><span class="pre">makemigrations</span></tt>. It
+then uses these models to compare against the ones in your <tt class="docutils literal"><span class="pre">models.py</span></tt> files
+to work out what you have changed.</p>
+<p>You should rarely, if ever, need to edit migration files by hand, but
+it&#8217;s entirely possible to write them manually if you need to. Some of the
+more complex operations are not autodetectable and are only available via
+a hand-written migration, so don&#8217;t be scared about editing them if you have to.</p>
+</div>
+<div class="section" id="adding-migrations-to-apps">
+<h2>Adding migrations to apps<a class="headerlink" href="#adding-migrations-to-apps" title="Permalink to this headline">¶</a></h2>
+<p>Adding migrations to new apps is straightforward - they come preconfigured to
+accept migrations, and so just run <a href="#id8"><span class="problematic" id="id9">:djadmin:`makemigrations`</span></a> once you&#8217;ve made
+some changes.</p>
+<p>If your app already has models and database tables, and doesn&#8217;t have migrations
+yet (for example, you created it against a previous Django version), you&#8217;ll
+need to convert it to use migrations; this is a simple process:</p>
+<div class="highlight-python"><pre>$ python manage.py makemigrations yourappname</pre>
+</div>
+<p>This will make a new initial migration for your app. Now, when you run
+<a href="#id10"><span class="problematic" id="id11">:djadmin:`migrate`</span></a>, Django will detect that you have an initial migration
+<em>and</em> that the tables it wants to create already exist, and will mark the
+migration as already applied.</p>
+<p>Note that this only works given two things:</p>
+<ul class="simple">
+<li>You have not changed your models since you made their tables. For migrations
+to work, you must make the initial migration <em>first</em> and then make changes,
+as Django compares changes against migration files, not the database.</li>
+<li>You have not manually edited your database - Django won&#8217;t be able to detect
+that your database doesn&#8217;t match your models, you&#8217;ll just get errors when
+migrations try to modify those tables.</li>
+</ul>
+</div>
+<div class="section" id="historical-models">
+<span id="id12"></span><h2>Historical models<a class="headerlink" href="#historical-models" title="Permalink to this headline">¶</a></h2>
+<p>When you run migrations, Django is working from historical versions of
+your models stored in the migration files. If you write Python code
+using the <tt class="docutils literal"><span class="pre">django.db.migrations.RunPython</span></tt> operation, or if you have
+<tt class="docutils literal"><span class="pre">allow_migrate</span></tt> methods on your database routers, you will be exposed
+to these versions of your models.</p>
+<p>Because it&#8217;s impossible to serialize arbitrary Python code, these historical
+models will not have any custom methods or managers that you have defined.
+They will, however, have the same fields, relationships and <tt class="docutils literal"><span class="pre">Meta</span></tt> options
+(also versioned, so they may be different from your current ones).</p>
+<p>In addition, the base classes of the model are just stored as pointers,
+so you must always keep base classes around for as long as there is a migration
+that contains a reference to them. On the plus side, methods and managers
+from these base classes inherit normally, so if you absolutely need access
+to these you can opt to move them into a superclass.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Migrations</a><ul>
+<li><a class="reference internal" href="#a-brief-history">A Brief History</a></li>
+<li><a class="reference internal" href="#two-commands">Two Commands</a></li>
+<li><a class="reference internal" href="#backend-support">Backend Support</a><ul>
+<li><a class="reference internal" href="#postgresql">PostgreSQL</a></li>
+<li><a class="reference internal" href="#mysql">MySQL</a></li>
+<li><a class="reference internal" href="#sqlite">SQLite</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#workflow">Workflow</a><ul>
+<li><a class="reference internal" href="#version-control">Version control</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li><a class="reference internal" href="#migration-files">Migration files</a></li>
+<li><a class="reference internal" href="#adding-migrations-to-apps">Adding migrations to apps</a></li>
+<li><a class="reference internal" href="#historical-models">Historical models</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/topics/migrations.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Glossary &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="glossary">
+<span id="id1"></span><h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h1>
+<dl class="glossary docutils">
+<dt id="term-field">field</dt>
+<dd><p class="first">An attribute on a <a class="reference internal" href="#term-model"><em class="xref std std-term">model</em></a>; a given field usually maps directly to
+a single database column.</p>
+<p class="last">See <a class="reference internal" href="topics/db/models.html"><em>Models</em></a>.</p>
+</dd>
+<dt id="term-generic-view">generic view</dt>
+<dd><p class="first">A higher-order <a class="reference internal" href="#term-view"><em class="xref std std-term">view</em></a> function that provides an abstract/generic
+implementation of a common idiom or pattern found in view development.</p>
+<p class="last">See <a class="reference internal" href="topics/class-based-views/index.html"><em>Class-based views</em></a>.</p>
+</dd>
+<dt id="term-model">model</dt>
+<dd><p class="first">Models store your application&#8217;s data.</p>
+<p class="last">See <a class="reference internal" href="topics/db/models.html"><em>Models</em></a>.</p>
+</dd>
+<dt id="term-mtv">MTV</dt>
+<dd><p class="first">&#8220;Model-template-view&#8221;; a software pattern, similar in style to MVC, but
+a better description of the way Django does things.</p>
+<p class="last">See <a class="reference internal" href="faq/general.html#faq-mtv"><em>the FAQ entry</em></a>.</p>
+</dd>
+<dt id="term-mvc">MVC</dt>
+<dd><a class="reference external" href="http://en.wikipedia.org/wiki/Model-view-controller">Model-view-controller</a>; a software pattern. Django <a class="reference internal" href="faq/general.html#faq-mtv"><em>follows MVC
+to some extent</em></a>.</dd>
+<dt id="term-project">project</dt>
+<dd>A Python package &#8211; i.e. a directory of code &#8211; that contains all the
+settings for an instance of Django. This would include database
+configuration, Django-specific options and application-specific
+settings.</dd>
+<dt id="term-property">property</dt>
+<dd><p class="first">Also known as &#8220;managed attributes&#8221;, and a feature of Python since
+version 2.2. This is a neat way to implement attributes whose usage
+resembles attribute access, but whose implementation uses method calls.</p>
+<p class="last">See <a class="reference external" href="http://docs.python.org/library/functions.html#property" title="(in Python v2.7)"><tt class="xref py py-func docutils literal"><span class="pre">property()</span></tt></a>.</p>
+</dd>
+<dt id="term-queryset">queryset</dt>
+<dd><p class="first">An object representing some set of rows to be fetched from the database.</p>
+<p class="last">See <a class="reference internal" href="topics/db/queries.html"><em>Making queries</em></a>.</p>
+</dd>
+<dt id="term-slug">slug</dt>
+<dd><p class="first">A short label for something, containing only letters, numbers,
+underscores or hyphens. They&#8217;re generally used in URLs. For
+example, in a typical blog entry URL:</p>
+<pre class="literal-block">
+<a class="reference external" href="https://www.djangoproject.com/weblog/2008/apr/12/">https://www.djangoproject.com/weblog/2008/apr/12/</a><strong>spring</strong>/
+</pre>
+<p class="last">the last bit (<tt class="docutils literal"><span class="pre">spring</span></tt>) is the slug.</p>
+</dd>
+<dt id="term-template">template</dt>
+<dd><p class="first">A chunk of text that acts as formatting for representing data. A
+template helps to abstract the presentation of data from the data
+itself.</p>
+<p class="last">See <a class="reference internal" href="topics/templates.html"><em>The Django template language</em></a>.</p>
+</dd>
+<dt id="term-view">view</dt>
+<dd>A function responsible for rending a page.</dd>
+</dl>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/glossary.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

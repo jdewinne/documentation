@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Django 1.5.5 release notes &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="django-1-5-5-release-notes">
+<h1>Django 1.5.5 release notes<a class="headerlink" href="#django-1-5-5-release-notes" title="Permalink to this headline">¶</a></h1>
+<p><em>October 23, 2013</em></p>
+<p>Django 1.5.5 fixes a couple security-related bugs and several other bugs in the
+1.5 series.</p>
+<div class="section" id="readdressed-denial-of-service-via-password-hashers">
+<h2>Readdressed denial-of-service via password hashers<a class="headerlink" href="#readdressed-denial-of-service-via-password-hashers" title="Permalink to this headline">¶</a></h2>
+<p>Django 1.5.4 imposes a 4096-byte limit on passwords in order to mitigate a
+denial-of-service attack through submission of bogus but extremely large
+passwords. In Django 1.5.5, we&#8217;ve reverted this change and instead improved
+the speed of our PBKDF2 algorithm by not rehashing the key on every iteration.</p>
+</div>
+<div class="section" id="properly-rotate-csrf-token-on-login">
+<h2>Properly rotate CSRF token on login<a class="headerlink" href="#properly-rotate-csrf-token-on-login" title="Permalink to this headline">¶</a></h2>
+<p>This behavior introduced as a security hardening measure in Django 1.5.2 did
+not work properly and is now fixed.</p>
+<div class="section" id="bugfixes">
+<h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Fixed a data corruption bug with <tt class="docutils literal"><span class="pre">datetime_safe.datetime.combine</span></tt> (#21256).</li>
+<li>Fixed a Python 3 incompatibility in <tt class="docutils literal"><span class="pre">django.utils.text.unescape_entities()</span></tt>
+(#21185).</li>
+<li>Fixed a couple data corruption issues with <tt class="docutils literal"><span class="pre">QuerySet</span></tt> edge cases under
+Oracle and MySQL (#21203, #21126).</li>
+<li>Fixed crashes when using combinations of <tt class="docutils literal"><span class="pre">annotate()</span></tt>,
+<tt class="docutils literal"><span class="pre">select_related()</span></tt>, and <tt class="docutils literal"><span class="pre">only()</span></tt> (#16436).</li>
+</ul>
+</div>
+<div class="section" id="backwards-incompatible-changes">
+<h3>Backwards incompatible changes<a class="headerlink" href="#backwards-incompatible-changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>The undocumented <tt class="docutils literal"><span class="pre">django.core.servers.basehttp.WSGIServerException</span></tt> has
+been removed. Use <tt class="docutils literal"><span class="pre">socket.error</span></tt> provided by the standard library instead.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Django 1.5.5 release notes</a><ul>
+<li><a class="reference internal" href="#readdressed-denial-of-service-via-password-hashers">Readdressed denial-of-service via password hashers</a></li>
+<li><a class="reference internal" href="#properly-rotate-csrf-token-on-login">Properly rotate CSRF token on login</a><ul>
+<li><a class="reference internal" href="#bugfixes">Bugfixes</a></li>
+<li><a class="reference internal" href="#backwards-incompatible-changes">Backwards incompatible changes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/releases/1.5.5.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Writing your first Django app, part 4 &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="writing-your-first-django-app-part-4">
+<h1>Writing your first Django app, part 4<a class="headerlink" href="#writing-your-first-django-app-part-4" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial begins where <a class="reference internal" href="tutorial03.html"><em>Tutorial 3</em></a> left off. We&#8217;re
+continuing the Web-poll application and will focus on simple form processing and
+cutting down our code.</p>
+<div class="section" id="write-a-simple-form">
+<h2>Write a simple form<a class="headerlink" href="#write-a-simple-form" title="Permalink to this headline">¶</a></h2>
+<p>Let&#8217;s update our poll detail template (&#8220;polls/detail.html&#8221;) from the last
+tutorial, so that the template contains an HTML <tt class="docutils literal"><span class="pre">&lt;form&gt;</span></tt> element:</p>
+<p>A quick rundown:</p>
+<ul class="simple">
+<li>The above template displays a radio button for each question choice. The
+<tt class="docutils literal"><span class="pre">value</span></tt> of each radio button is the associated question choice&#8217;s ID. The
+<tt class="docutils literal"><span class="pre">name</span></tt> of each radio button is <tt class="docutils literal"><span class="pre">&quot;choice&quot;</span></tt>. That means, when somebody
+selects one of the radio buttons and submits the form, it&#8217;ll send the
+POST data <tt class="docutils literal"><span class="pre">choice=3</span></tt>. This is the basic concept of HTML forms.</li>
+<li>We set the form&#8217;s <tt class="docutils literal"><span class="pre">action</span></tt> to <tt class="docutils literal"><span class="pre">{%</span> <span class="pre">url</span> <span class="pre">'polls:vote'</span> <span class="pre">question.id</span> <span class="pre">%}</span></tt>, and we
+set <tt class="docutils literal"><span class="pre">method=&quot;post&quot;</span></tt>. Using <tt class="docutils literal"><span class="pre">method=&quot;post&quot;</span></tt> (as opposed to
+<tt class="docutils literal"><span class="pre">method=&quot;get&quot;</span></tt>) is very important, because the act of submitting this
+form will alter data server-side. Whenever you create a form that alters
+data server-side, use <tt class="docutils literal"><span class="pre">method=&quot;post&quot;</span></tt>. This tip isn&#8217;t specific to
+Django; it&#8217;s just good Web development practice.</li>
+<li><tt class="docutils literal"><span class="pre">forloop.counter</span></tt> indicates how many times the <a href="#id1"><span class="problematic" id="id2">:ttag:`for`</span></a> tag has gone
+through its loop</li>
+<li>Since we&#8217;re creating a POST form (which can have the effect of modifying
+data), we need to worry about Cross Site Request Forgeries.
+Thankfully, you don&#8217;t have to worry too hard, because Django comes with
+a very easy-to-use system for protecting against it. In short, all POST
+forms that are targeted at internal URLs should use the
+<a href="#id3"><span class="problematic" id="id4">:ttag:`{% csrf_token %}&lt;csrf_token&gt;`</span></a> template tag.</li>
+</ul>
+<p>Now, let&#8217;s create a Django view that handles the submitted data and does
+something with it. Remember, in <a class="reference internal" href="tutorial03.html"><em>Tutorial 3</em></a>, we
+created a URLconf for the polls application that includes this line:</p>
+<p>We also created a dummy implementation of the <tt class="docutils literal"><span class="pre">vote()</span></tt> function. Let&#8217;s
+create a real version. Add the following to <tt class="docutils literal"><span class="pre">polls/views.py</span></tt>:</p>
+<p>This code includes a few things we haven&#8217;t covered yet in this tutorial:</p>
+<ul>
+<li><p class="first"><a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest.POST" title="django.http.HttpRequest.POST"><tt class="xref py py-attr docutils literal"><span class="pre">request.POST</span></tt></a> is a dictionary-like
+object that lets you access submitted data by key name. In this case,
+<tt class="docutils literal"><span class="pre">request.POST['choice']</span></tt> returns the ID of the selected choice, as a
+string. <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest.POST" title="django.http.HttpRequest.POST"><tt class="xref py py-attr docutils literal"><span class="pre">request.POST</span></tt></a> values are
+always strings.</p>
+<p>Note that Django also provides <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest.GET" title="django.http.HttpRequest.GET"><tt class="xref py py-attr docutils literal"><span class="pre">request.GET</span></tt></a> for accessing GET data in the same way &#8211;
+but we&#8217;re explicitly using <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest.POST" title="django.http.HttpRequest.POST"><tt class="xref py py-attr docutils literal"><span class="pre">request.POST</span></tt></a> in our code, to ensure that data is only
+altered via a POST call.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">request.POST['choice']</span></tt> will raise <a class="reference external" href="http://docs.python.org/library/exceptions.html#exceptions.KeyError" title="(in Python v2.7)"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> if
+<tt class="docutils literal"><span class="pre">choice</span></tt> wasn&#8217;t provided in POST data. The above code checks for
+<a class="reference external" href="http://docs.python.org/library/exceptions.html#exceptions.KeyError" title="(in Python v2.7)"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> and redisplays the question form with an error
+message if <tt class="docutils literal"><span class="pre">choice</span></tt> isn&#8217;t given.</p>
+</li>
+<li><p class="first">After incrementing the choice count, the code returns an
+<a class="reference internal" href="../ref/request-response.html#django.http.HttpResponseRedirect" title="django.http.HttpResponseRedirect"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponseRedirect</span></tt></a> rather than a normal
+<a class="reference internal" href="../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a>.
+<a class="reference internal" href="../ref/request-response.html#django.http.HttpResponseRedirect" title="django.http.HttpResponseRedirect"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponseRedirect</span></tt></a> takes a single argument: the
+URL to which the user will be redirected (see the following point for how
+we construct the URL in this case).</p>
+<p>As the Python comment above points out, you should always return an
+<a class="reference internal" href="../ref/request-response.html#django.http.HttpResponseRedirect" title="django.http.HttpResponseRedirect"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponseRedirect</span></tt></a> after successfully dealing with
+POST data. This tip isn&#8217;t specific to Django; it&#8217;s just good Web
+development practice.</p>
+</li>
+<li><p class="first">We are using the <a class="reference internal" href="../ref/urlresolvers.html#django.core.urlresolvers.reverse" title="django.core.urlresolvers.reverse"><tt class="xref py py-func docutils literal"><span class="pre">reverse()</span></tt></a> function in the
+<a class="reference internal" href="../ref/request-response.html#django.http.HttpResponseRedirect" title="django.http.HttpResponseRedirect"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponseRedirect</span></tt></a> constructor in this example.
+This function helps avoid having to hardcode a URL in the view function.
+It is given the name of the view that we want to pass control to and the
+variable portion of the URL pattern that points to that view. In this
+case, using the URLconf we set up in Tutorial 3, this
+<a class="reference internal" href="../ref/urlresolvers.html#django.core.urlresolvers.reverse" title="django.core.urlresolvers.reverse"><tt class="xref py py-func docutils literal"><span class="pre">reverse()</span></tt></a> call will return a string like</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;/polls/3/results/&#39;</span>
+</pre></div>
+</div>
+<p>... where the <tt class="docutils literal"><span class="pre">3</span></tt> is the value of <tt class="docutils literal"><span class="pre">p.id</span></tt>. This redirected URL will
+then call the <tt class="docutils literal"><span class="pre">'results'</span></tt> view to display the final page.</p>
+</li>
+</ul>
+<p>As mentioned in Tutorial 3, <tt class="docutils literal"><span class="pre">request</span></tt> is a <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt></a>
+object. For more on <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt></a> objects, see the
+<a class="reference internal" href="../ref/request-response.html"><em>request and response documentation</em></a>.</p>
+<p>After somebody votes in a question, the <tt class="docutils literal"><span class="pre">vote()</span></tt> view redirects to the results
+page for the question. Let&#8217;s write that view:</p>
+<p>This is almost exactly the same as the <tt class="docutils literal"><span class="pre">detail()</span></tt> view from <a class="reference internal" href="tutorial03.html"><em>Tutorial 3</em></a>. The only difference is the template name. We&#8217;ll fix this
+redundancy later.</p>
+<p>Now, create a <tt class="docutils literal"><span class="pre">polls/results.html</span></tt> template:</p>
+<p>Now, go to <tt class="docutils literal"><span class="pre">/polls/1/</span></tt> in your browser and vote in the question. You should see a
+results page that gets updated each time you vote. If you submit the form
+without having chosen a choice, you should see the error message.</p>
+</div>
+<div class="section" id="use-generic-views-less-code-is-better">
+<h2>Use generic views: Less code is better<a class="headerlink" href="#use-generic-views-less-code-is-better" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">detail()</span></tt> (from <a class="reference internal" href="tutorial03.html"><em>Tutorial 3</em></a>) and <tt class="docutils literal"><span class="pre">results()</span></tt>
+views are stupidly simple &#8211; and, as mentioned above, redundant. The <tt class="docutils literal"><span class="pre">index()</span></tt>
+view (also from Tutorial 3), which displays a list of polls, is similar.</p>
+<p>These views represent a common case of basic Web development: getting data from
+the database according to a parameter passed in the URL, loading a template and
+returning the rendered template. Because this is so common, Django provides a
+shortcut, called the &#8220;generic views&#8221; system.</p>
+<p>Generic views abstract common patterns to the point where you don&#8217;t even need
+to write Python code to write an app.</p>
+<p>Let&#8217;s convert our poll app to use the generic views system, so we can delete a
+bunch of our own code. We&#8217;ll just have to take a few steps to make the
+conversion. We will:</p>
+<ol class="arabic simple">
+<li>Convert the URLconf.</li>
+<li>Delete some of the old, unneeded views.</li>
+<li>Introduce new views based on Django&#8217;s generic views.</li>
+</ol>
+<p>Read on for details.</p>
+<div class="admonition-why-the-code-shuffle admonition">
+<p class="first admonition-title">Why the code-shuffle?</p>
+<p>Generally, when writing a Django app, you&#8217;ll evaluate whether generic views
+are a good fit for your problem, and you&#8217;ll use them from the beginning,
+rather than refactoring your code halfway through. But this tutorial
+intentionally has focused on writing the views &#8220;the hard way&#8221; until now, to
+focus on core concepts.</p>
+<p class="last">You should know basic math before you start using a calculator.</p>
+</div>
+<div class="section" id="amend-urlconf">
+<h3>Amend URLconf<a class="headerlink" href="#amend-urlconf" title="Permalink to this headline">¶</a></h3>
+<p>First, open the <tt class="docutils literal"><span class="pre">polls/urls.py</span></tt> URLconf and change it like so:</p>
+</div>
+<div class="section" id="amend-views">
+<h3>Amend views<a class="headerlink" href="#amend-views" title="Permalink to this headline">¶</a></h3>
+<p>Next, we&#8217;re going to remove our old <tt class="docutils literal"><span class="pre">index</span></tt>, <tt class="docutils literal"><span class="pre">detail</span></tt>, and <tt class="docutils literal"><span class="pre">results</span></tt>
+views and use Django&#8217;s generic views instead. To do so, open the
+<tt class="docutils literal"><span class="pre">polls/views.py</span></tt> file and change it like so:</p>
+<p>We&#8217;re using two generic views here:
+<a class="reference internal" href="../ref/class-based-views/generic-display.html#django.views.generic.list.ListView" title="django.views.generic.list.ListView"><tt class="xref py py-class docutils literal"><span class="pre">ListView</span></tt></a> and
+<a class="reference internal" href="../ref/class-based-views/generic-display.html#django.views.generic.detail.DetailView" title="django.views.generic.detail.DetailView"><tt class="xref py py-class docutils literal"><span class="pre">DetailView</span></tt></a>. Respectively, those
+two views abstract the concepts of &#8220;display a list of objects&#8221; and
+&#8220;display a detail page for a particular type of object.&#8221;</p>
+<ul class="simple">
+<li>Each generic view needs to know what model it will be acting
+upon. This is provided using the <tt class="docutils literal"><span class="pre">model</span></tt> attribute.</li>
+<li>The <a class="reference internal" href="../ref/class-based-views/generic-display.html#django.views.generic.detail.DetailView" title="django.views.generic.detail.DetailView"><tt class="xref py py-class docutils literal"><span class="pre">DetailView</span></tt></a> generic view
+expects the primary key value captured from the URL to be called
+<tt class="docutils literal"><span class="pre">&quot;pk&quot;</span></tt>, so we&#8217;ve changed <tt class="docutils literal"><span class="pre">question_id</span></tt> to <tt class="docutils literal"><span class="pre">pk</span></tt> for the generic
+views.</li>
+</ul>
+<p>By default, the <a class="reference internal" href="../ref/class-based-views/generic-display.html#django.views.generic.detail.DetailView" title="django.views.generic.detail.DetailView"><tt class="xref py py-class docutils literal"><span class="pre">DetailView</span></tt></a> generic
+view uses a template called <tt class="docutils literal"><span class="pre">&lt;app</span> <span class="pre">name&gt;/&lt;model</span> <span class="pre">name&gt;_detail.html</span></tt>.
+In our case, it would use the template <tt class="docutils literal"><span class="pre">&quot;polls/question_detail.html&quot;</span></tt>. The
+<tt class="docutils literal"><span class="pre">template_name</span></tt> attribute is used to tell Django to use a specific
+template name instead of the autogenerated default template name. We
+also specify the <tt class="docutils literal"><span class="pre">template_name</span></tt> for the <tt class="docutils literal"><span class="pre">results</span></tt> list view &#8211;
+this ensures that the results view and the detail view have a
+different appearance when rendered, even though they&#8217;re both a
+<a class="reference internal" href="../ref/class-based-views/generic-display.html#django.views.generic.detail.DetailView" title="django.views.generic.detail.DetailView"><tt class="xref py py-class docutils literal"><span class="pre">DetailView</span></tt></a> behind the scenes.</p>
+<p>Similarly, the <a class="reference internal" href="../ref/class-based-views/generic-display.html#django.views.generic.list.ListView" title="django.views.generic.list.ListView"><tt class="xref py py-class docutils literal"><span class="pre">ListView</span></tt></a> generic
+view uses a default template called <tt class="docutils literal"><span class="pre">&lt;app</span> <span class="pre">name&gt;/&lt;model</span>
+<span class="pre">name&gt;_list.html</span></tt>; we use <tt class="docutils literal"><span class="pre">template_name</span></tt> to tell
+<a class="reference internal" href="../ref/class-based-views/generic-display.html#django.views.generic.list.ListView" title="django.views.generic.list.ListView"><tt class="xref py py-class docutils literal"><span class="pre">ListView</span></tt></a> to use our existing
+<tt class="docutils literal"><span class="pre">&quot;polls/index.html&quot;</span></tt> template.</p>
+<p>In previous parts of the tutorial, the templates have been provided
+with a context that contains the <tt class="docutils literal"><span class="pre">question</span></tt> and <tt class="docutils literal"><span class="pre">latest_question_list</span></tt>
+context variables. For <tt class="docutils literal"><span class="pre">DetailView</span></tt> the <tt class="docutils literal"><span class="pre">question</span></tt> variable is provided
+automatically &#8211; since we&#8217;re using a Django model (<tt class="docutils literal"><span class="pre">Question</span></tt>), Django
+is able to determine an appropriate name for the context variable.
+However, for ListView, the automatically generated context variable is
+<tt class="docutils literal"><span class="pre">question_list</span></tt>. To override this we provide the <tt class="docutils literal"><span class="pre">context_object_name</span></tt>
+attribute, specifying that we want to use <tt class="docutils literal"><span class="pre">latest_question_list</span></tt> instead.
+As an alternative approach, you could change your templates to match
+the new default context variables &#8211; but it&#8217;s a lot easier to just
+tell Django to use the variable you want.</p>
+<p>Run the server, and use your new polling app based on generic views.</p>
+<p>For full details on generic views, see the <a class="reference internal" href="../topics/class-based-views/index.html"><em>generic views documentation</em></a>.</p>
+<p>When you&#8217;re comfortable with forms and generic views, read <a class="reference internal" href="tutorial05.html"><em>part 5 of this
+tutorial</em></a> to learn about testing our polls app.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Writing your first Django app, part 4</a><ul>
+<li><a class="reference internal" href="#write-a-simple-form">Write a simple form</a></li>
+<li><a class="reference internal" href="#use-generic-views-less-code-is-better">Use generic views: Less code is better</a><ul>
+<li><a class="reference internal" href="#amend-urlconf">Amend URLconf</a></li>
+<li><a class="reference internal" href="#amend-views">Amend views</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/intro/tutorial04.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

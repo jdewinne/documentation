@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Writing your first Django app, part 1 &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="writing-your-first-django-app-part-1">
+<h1>Writing your first Django app, part 1<a class="headerlink" href="#writing-your-first-django-app-part-1" title="Permalink to this headline">¶</a></h1>
+<p>Let&#8217;s learn by example.</p>
+<p>Throughout this tutorial, we&#8217;ll walk you through the creation of a basic
+poll application.</p>
+<p>It&#8217;ll consist of two parts:</p>
+<ul class="simple">
+<li>A public site that lets people view polls and vote in them.</li>
+<li>An admin site that lets you add, change and delete polls.</li>
+</ul>
+<p>We&#8217;ll assume you have <tt class="xref doc docutils literal"><span class="pre">Django</span> <span class="pre">installed</span></tt> already. You can
+tell Django is installed and which version by running the following command:</p>
+<div class="highlight-bash"><div class="highlight"><pre>python -c <span class="s2">&quot;import django; print(django.get_version())&quot;</span>
+</pre></div>
+</div>
+<p>If Django is installed, you should see the version of your installation. If it
+isn&#8217;t, you&#8217;ll get an error telling &#8220;No module named django&#8221;.</p>
+<p>This tutorial is written for Django 1.0 and Python 2.x. If the Django
+version doesn&#8217;t match, you can refer to the tutorial for your version of
+Django by using the version switcher at the bottom right corner of this page,
+or update Django to the newest version. If you are using Python 3.x, be aware
+that your code may need to differ from what is in the tutorial and you should
+continue using the tutorial only if you know what you are doing with Python
+3.x.</p>
+<p>See <tt class="xref doc docutils literal"><span class="pre">How</span> <span class="pre">to</span> <span class="pre">install</span> <span class="pre">Django</span></tt> for advice on how to remove
+older versions of Django and install a newer one.</p>
+<div class="admonition-where-to-get-help admonition">
+<p class="first admonition-title">Where to get help:</p>
+<p class="last">If you&#8217;re having trouble going through this tutorial, please post a message
+to <a href="#id2"><span class="problematic" id="id3">|django-users|</span></a> or drop by <a class="reference external" href="irc://irc.freenode.net/django">#django on irc.freenode.net</a> to chat
+with other Django users who might be able to help.</p>
+</div>
+<div class="section" id="creating-a-project">
+<h2>Creating a project<a class="headerlink" href="#creating-a-project" title="Permalink to this headline">¶</a></h2>
+<p>If this is your first time using Django, you&#8217;ll have to take care of some
+initial setup. Namely, you&#8217;ll need to auto-generate some code that establishes a
+Django <em class="xref std std-term">project</em> &#8211; a collection of settings for an instance of Django,
+including database configuration, Django-specific options and
+application-specific settings.</p>
+<p>From the command line, <tt class="docutils literal"><span class="pre">cd</span></tt> into a directory where you&#8217;d like to store your
+code, then run the following command:</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Writing your first Django app, part 1</a><ul>
+<li><a class="reference internal" href="#creating-a-project">Creating a project</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/intro/tutorial01.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

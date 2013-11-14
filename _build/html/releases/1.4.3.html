@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Django 1.4.3 release notes &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="django-1-4-3-release-notes">
+<h1>Django 1.4.3 release notes<a class="headerlink" href="#django-1-4-3-release-notes" title="Permalink to this headline">¶</a></h1>
+<p><em>December 10, 2012</em></p>
+<p>Django 1.4.3 addresses two security issues present in previous Django releases
+in the 1.4 series.</p>
+<p>Please be aware that this security release is slightly different from previous
+ones. Both issues addressed here have been dealt with in prior security updates
+to Django. In one case, we have received ongoing reports of problems, and in
+the other we&#8217;ve chosen to take further steps to tighten up Django&#8217;s code in
+response to independent discovery of potential problems from multiple sources.</p>
+<div class="section" id="host-header-poisoning">
+<h2>Host header poisoning<a class="headerlink" href="#host-header-poisoning" title="Permalink to this headline">¶</a></h2>
+<p>Several earlier Django security releases focused on the issue of poisoning the
+HTTP Host header, causing Django to generate URLs pointing to arbitrary,
+potentially-malicious domains.</p>
+<p>In response to further input received and reports of continuing issues
+following the previous release, we&#8217;re taking additional steps to tighten Host
+header validation. Rather than attempt to accommodate all features HTTP
+supports here, Django&#8217;s Host header validation attempts to support a smaller,
+but far more common, subset:</p>
+<ul class="simple">
+<li>Hostnames must consist of characters [A-Za-z0-9] plus hyphen (&#8216;-&#8216;) or dot
+(&#8216;.&#8217;).</li>
+<li>IP addresses &#8211; both IPv4 and IPv6 &#8211; are permitted.</li>
+<li>Port, if specified, is numeric.</li>
+</ul>
+<p>Any deviation from this will now be rejected, raising the exception
+<a class="reference internal" href="../ref/exceptions.html#django.core.exceptions.SuspiciousOperation" title="django.core.exceptions.SuspiciousOperation"><tt class="xref py py-exc docutils literal"><span class="pre">django.core.exceptions.SuspiciousOperation</span></tt></a>.</p>
+</div>
+<div class="section" id="redirect-poisoning">
+<h2>Redirect poisoning<a class="headerlink" href="#redirect-poisoning" title="Permalink to this headline">¶</a></h2>
+<p>Also following up on a previous issue: in July of this year, we made changes to
+Django&#8217;s HTTP redirect classes, performing additional validation of the scheme
+of the URL to redirect to (since, both within Django&#8217;s own supplied
+applications and many third-party applications, accepting a user-supplied
+redirect target is a common pattern).</p>
+<p>Since then, two independent audits of the code turned up further potential
+problems. So, similar to the Host-header issue, we are taking steps to provide
+tighter validation in response to reported problems (primarily with third-party
+applications, but to a certain extent also within Django itself). This comes in
+two parts:</p>
+<p>1. A new utility function, <tt class="docutils literal"><span class="pre">django.utils.http.is_safe_url</span></tt>, is added; this
+function takes a URL and a hostname, and checks that the URL is either
+relative, or if absolute matches the supplied hostname. This function is
+intended for use whenever user-supplied redirect targets are accepted, to
+ensure that such redirects cannot lead to arbitrary third-party sites.</p>
+<p>2. All of Django&#8217;s own built-in views &#8211; primarily in the authentication system
+&#8211; which allow user-supplied redirect targets now use <tt class="docutils literal"><span class="pre">is_safe_url</span></tt> to
+validate the supplied URL.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Django 1.4.3 release notes</a><ul>
+<li><a class="reference internal" href="#host-header-poisoning">Host header poisoning</a></li>
+<li><a class="reference internal" href="#redirect-poisoning">Redirect poisoning</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/releases/1.4.3.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

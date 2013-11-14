@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The “local flavor” add-ons &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-local-flavor-add-ons">
+<h1>The &#8220;local flavor&#8221; add-ons<a class="headerlink" href="#the-local-flavor-add-ons" title="Permalink to this headline">¶</a></h1>
+<p>Historically, Django has shipped with <tt class="docutils literal"><span class="pre">django.contrib.localflavor</span></tt> &#8211;
+assorted pieces of code that are useful for particular countries or cultures.
+This code is now distributed separately from Django, for easier maintenance
+and to trim the size of Django&#8217;s codebase.</p>
+<p>The new localflavor package is named <tt class="docutils literal"><span class="pre">django-localflavor</span></tt>, with a main
+module called <tt class="docutils literal"><span class="pre">localflavor</span></tt> and many subpackages using an
+<a class="reference external" href="http://www.iso.org/iso/country_codes.htm">ISO 3166 country code</a>. For example: <tt class="docutils literal"><span class="pre">localflavor.us</span></tt> is the
+localflavor package for the U.S.A.</p>
+<p>Most of these <tt class="docutils literal"><span class="pre">localflavor</span></tt> add-ons are country-specific fields for the
+<a class="reference internal" href="forms/index.html"><em>forms</em></a> framework &#8211; for example, a
+<tt class="docutils literal"><span class="pre">USStateField</span></tt> that knows how to validate U.S. state abbreviations and a
+<tt class="docutils literal"><span class="pre">FISocialSecurityNumber</span></tt> that knows how to validate Finnish social security
+numbers.</p>
+<p>To use one of these localized components, just import the relevant subpackage.
+For example, here&#8217;s how you can create a form with a field representing a
+French telephone number:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+<span class="kn">from</span> <span class="nn">localflavor.fr.forms</span> <span class="kn">import</span> <span class="n">FRPhoneNumberField</span>
+
+<span class="k">class</span> <span class="nc">MyForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">my_french_phone_no</span> <span class="o">=</span> <span class="n">FRPhoneNumberField</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>For documentation on a given country&#8217;s localflavor helpers, see its README
+file.</p>
+<div class="section" id="supported-countries">
+<span id="localflavor-packages"></span><h2>Supported countries<a class="headerlink" href="#supported-countries" title="Permalink to this headline">¶</a></h2>
+<p>See the official documentation for more information:</p>
+<blockquote>
+<div><a class="reference external" href="https://django-localflavor.readthedocs.org/">https://django-localflavor.readthedocs.org/</a></div></blockquote>
+</div>
+<div class="section" id="internationalization-of-localflavors">
+<h2>Internationalization of localflavors<a class="headerlink" href="#internationalization-of-localflavors" title="Permalink to this headline">¶</a></h2>
+<p>To activate translations for the <tt class="docutils literal"><span class="pre">localflavor</span></tt> application, you must include
+the application&#8217;s name in the <a href="#id1"><span class="problematic" id="id2">:setting:`INSTALLED_APPS`</span></a> setting, so the
+internationalization system can find the catalog, as explained in
+<a class="reference internal" href="i18n/translation.html#how-django-discovers-translations"><em>How Django discovers translations</em></a>.</p>
+</div>
+<div class="section" id="how-to-migrate">
+<span id="localflavor-how-to-migrate"></span><h2>How to migrate<a class="headerlink" href="#how-to-migrate" title="Permalink to this headline">¶</a></h2>
+<p>If you&#8217;ve used the old <tt class="docutils literal"><span class="pre">django.contrib.localflavor</span></tt> package or one of the
+temporary <tt class="docutils literal"><span class="pre">django-localflavor-*</span></tt> releases, follow these two easy steps to
+update your code:</p>
+<ol class="arabic">
+<li><p class="first">Install the third-party <tt class="docutils literal"><span class="pre">django-localflavor</span></tt> package from PyPI.</p>
+</li>
+<li><p class="first">Change your app&#8217;s import statements to reference the new package.</p>
+<p>For example, change this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.localflavor.fr.forms</span> <span class="kn">import</span> <span class="n">FRPhoneNumberField</span>
+</pre></div>
+</div>
+<p>...to this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">localflavor.fr.forms</span> <span class="kn">import</span> <span class="n">FRPhoneNumberField</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>The code in the new package is the same (it was copied directly from Django),
+so you don&#8217;t have to worry about backwards compatibility in terms of
+functionality. Only the imports have changed.</p>
+</div>
+<div class="section" id="deprecation-policy">
+<span id="localflavor-deprecation-policy"></span><h2>Deprecation policy<a class="headerlink" href="#deprecation-policy" title="Permalink to this headline">¶</a></h2>
+<p>In Django 1.5, importing from <tt class="docutils literal"><span class="pre">django.contrib.localflavor</span></tt> will result in a
+<tt class="docutils literal"><span class="pre">DeprecationWarning</span></tt>. This means your code will still work, but you should
+change it as soon as possible.</p>
+<p>In Django 1.6, importing from <tt class="docutils literal"><span class="pre">django.contrib.localflavor</span></tt> will no longer
+work.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The &#8220;local flavor&#8221; add-ons</a><ul>
+<li><a class="reference internal" href="#supported-countries">Supported countries</a></li>
+<li><a class="reference internal" href="#internationalization-of-localflavors">Internationalization of localflavors</a></li>
+<li><a class="reference internal" href="#how-to-migrate">How to migrate</a></li>
+<li><a class="reference internal" href="#deprecation-policy">Deprecation policy</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/topics/localflavor.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

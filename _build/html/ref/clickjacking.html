@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Clickjacking Protection &mdash; XLDeploy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="XLDeploy 1.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-django.middleware.clickjacking">
+<span id="clickjacking-protection"></span><h1>Clickjacking Protection<a class="headerlink" href="#module-django.middleware.clickjacking" title="Permalink to this headline">¶</a></h1>
+<p>The clickjacking middleware and decorators provide easy-to-use protection
+against <a class="reference external" href="http://en.wikipedia.org/wiki/Clickjacking">clickjacking</a>.  This type of attack occurs when a malicious site
+tricks a user into clicking on a concealed element of another site which they
+have loaded in a hidden frame or iframe.</p>
+<div class="section" id="an-example-of-clickjacking">
+<h2>An example of clickjacking<a class="headerlink" href="#an-example-of-clickjacking" title="Permalink to this headline">¶</a></h2>
+<p>Suppose an online store has a page where a logged in user can click &#8220;Buy Now&#8221; to
+purchase an item. A user has chosen to stay logged into the store all the time
+for convenience. An attacker site might create an &#8220;I Like Ponies&#8221; button on one
+of their own pages, and load the store&#8217;s page in a transparent iframe such that
+the &#8220;Buy Now&#8221; button is invisibly overlaid on the &#8220;I Like Ponies&#8221; button. If the
+user visits the attacker site and clicks &#8220;I Like Ponies&#8221; he or she will inadvertently
+click on the online store&#8217;s &#8220;Buy Now&#8221; button and unknowingly purchase the item.</p>
+</div>
+<div class="section" id="preventing-clickjacking">
+<span id="clickjacking-prevention"></span><h2>Preventing clickjacking<a class="headerlink" href="#preventing-clickjacking" title="Permalink to this headline">¶</a></h2>
+<p>Modern browsers honor the <a class="reference external" href="https://developer.mozilla.org/en/The_X-FRAME-OPTIONS_response_header">X-Frame-Options</a> HTTP header that indicates whether
+or not a resource is allowed to load within a frame or iframe. If the response
+contains the header with a value of <tt class="docutils literal"><span class="pre">SAMEORIGIN</span></tt> then the browser will only
+load the resource in a frame if the request originated from the same site. If
+the header is set to <tt class="docutils literal"><span class="pre">DENY</span></tt> then the browser will block the resource from
+loading in a frame no matter which site made the request.</p>
+<p>Django provides a few simple ways to include this header in responses from your
+site:</p>
+<ol class="arabic simple">
+<li>A simple middleware that sets the header in all responses.</li>
+<li>A set of view decorators that can be used to override the middleware or to
+only set the header for certain views.</li>
+</ol>
+</div>
+<div class="section" id="how-to-use-it">
+<h2>How to use it<a class="headerlink" href="#how-to-use-it" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="setting-x-frame-options-for-all-responses">
+<h3>Setting X-Frame-Options for all responses<a class="headerlink" href="#setting-x-frame-options-for-all-responses" title="Permalink to this headline">¶</a></h3>
+<p>To set the same <tt class="docutils literal"><span class="pre">X-Frame-Options</span></tt> value for all responses in your site, put
+<tt class="docutils literal"><span class="pre">'django.middleware.clickjacking.XFrameOptionsMiddleware'</span></tt> to
+<a href="#id1"><span class="problematic" id="id2">:setting:`MIDDLEWARE_CLASSES`</span></a>:</p>
+<div class="highlight-python"><pre>MIDDLEWARE_CLASSES = (
+    ...
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    ...
+)</pre>
+</div>
+<div class="versionchanged">
+<p><span>Changed in version 1.6: </span>This middleware is enabled in the settings file generated by
+<a href="#id3"><span class="problematic" id="id4">:djadmin:`startproject`</span></a>.</p>
+</div>
+<p>By default, the middleware will set the <tt class="docutils literal"><span class="pre">X-Frame-Options</span></tt> header to
+<tt class="docutils literal"><span class="pre">SAMEORIGIN</span></tt> for every outgoing <tt class="docutils literal"><span class="pre">HttpResponse</span></tt>. If you want <tt class="docutils literal"><span class="pre">DENY</span></tt>
+instead, set the <a href="#id5"><span class="problematic" id="id6">:setting:`X_FRAME_OPTIONS`</span></a> setting:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">X_FRAME_OPTIONS</span> <span class="o">=</span> <span class="s">&#39;DENY&#39;</span>
+</pre></div>
+</div>
+<p>When using the middleware there may be some views where you do <strong>not</strong> want the
+<tt class="docutils literal"><span class="pre">X-Frame-Options</span></tt> header set. For those cases, you can use a view decorator
+that tells the middleware not to set the header:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span> <span class="nn">django.views.decorators.clickjacking</span> <span class="kn">import</span> <span class="n">xframe_options_exempt</span>
+
+<span class="nd">@xframe_options_exempt</span>
+<span class="k">def</span> <span class="nf">ok_to_load_in_a_frame</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s">&quot;This page is safe to load in a frame on any site.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-x-frame-options-per-view">
+<h3>Setting X-Frame-Options per view<a class="headerlink" href="#setting-x-frame-options-per-view" title="Permalink to this headline">¶</a></h3>
+<p>To set the <tt class="docutils literal"><span class="pre">X-Frame-Options</span></tt> header on a per view basis, Django provides these
+decorators:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span> <span class="nn">django.views.decorators.clickjacking</span> <span class="kn">import</span> <span class="n">xframe_options_deny</span>
+<span class="kn">from</span> <span class="nn">django.views.decorators.clickjacking</span> <span class="kn">import</span> <span class="n">xframe_options_sameorigin</span>
+
+<span class="nd">@xframe_options_deny</span>
+<span class="k">def</span> <span class="nf">view_one</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s">&quot;I won&#39;t display in any frame!&quot;</span><span class="p">)</span>
+
+<span class="nd">@xframe_options_sameorigin</span>
+<span class="k">def</span> <span class="nf">view_two</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s">&quot;Display in a frame if it&#39;s from the same origin as me.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that you can use the decorators in conjunction with the middleware. Use of
+a decorator overrides the middleware.</p>
+</div>
+</div>
+<div class="section" id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">X-Frame-Options</span></tt> header will only protect against clickjacking in a
+modern browser. Older browsers will quietly ignore the header and need <a class="reference external" href="http://en.wikipedia.org/wiki/Clickjacking#Prevention">other
+clickjacking prevention techniques</a>.</p>
+<div class="section" id="browsers-that-support-x-frame-options">
+<h3>Browsers that support X-Frame-Options<a class="headerlink" href="#browsers-that-support-x-frame-options" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Internet Explorer 8+</li>
+<li>Firefox 3.6.9+</li>
+<li>Opera 10.5+</li>
+<li>Safari 4+</li>
+<li>Chrome 4.1+</li>
+</ul>
+</div>
+<div class="section" id="see-also">
+<h3>See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h3>
+<p>A <a class="reference external" href="https://developer.mozilla.org/en/The_X-FRAME-OPTIONS_response_header#Browser_compatibility">complete list</a> of browsers supporting <tt class="docutils literal"><span class="pre">X-Frame-Options</span></tt>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Clickjacking Protection</a><ul>
+<li><a class="reference internal" href="#an-example-of-clickjacking">An example of clickjacking</a></li>
+<li><a class="reference internal" href="#preventing-clickjacking">Preventing clickjacking</a></li>
+<li><a class="reference internal" href="#how-to-use-it">How to use it</a><ul>
+<li><a class="reference internal" href="#setting-x-frame-options-for-all-responses">Setting X-Frame-Options for all responses</a></li>
+<li><a class="reference internal" href="#setting-x-frame-options-per-view">Setting X-Frame-Options per view</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#limitations">Limitations</a><ul>
+<li><a class="reference internal" href="#browsers-that-support-x-frame-options">Browsers that support X-Frame-Options</a></li>
+<li><a class="reference internal" href="#see-also">See also</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/ref/clickjacking.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">XLDeploy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, XebiaLabs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>
